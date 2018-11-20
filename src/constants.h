@@ -1,6 +1,7 @@
 #ifndef __CONSTANTS_H__
 #define __CONSTANTS_H__
 
+#include <string>
 
 
 // PATHS
@@ -9,6 +10,10 @@ const std::string db_Scores = "./Scores/";
 const std::string db_Align = "./Alignments/";
 const std::string ex_STRIDE = "./STRIDE/stride";
 const std::string ex_TMALIGN = "./TMalign/TMalign";
+
+
+// MATH
+#define M_EPS 1e-15
 
 
 // PROTEIN

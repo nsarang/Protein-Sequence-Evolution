@@ -6,9 +6,7 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
-
-
-#define M_EPS 1e-15
+#include "constants.h"
 
 
 

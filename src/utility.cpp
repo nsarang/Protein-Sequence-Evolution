@@ -22,7 +22,7 @@ bool IsStandardAA(std::string abrv)
     return !(abrv == "ASX" || abrv == "GLX" || abrv == "SEC" || abrv == "PYL" || abrv == "UNK");
 }
 
-
+/*
 void ParsePDB(std::string fPath, std::vector<AminoAcid> &vecAminoAcid) {
     vecAminoAcid.clear();
     std::ifstream inFile(fPath);
@@ -45,9 +45,9 @@ void ParsePDB(std::string fPath, std::vector<AminoAcid> &vecAminoAcid) {
         assert(residue_map.count(vecAminoAcid.back().name) > 0);
     }
 }
+*/
 
-
-void progress_indicator(std::string text, long long current, long long total) {
+void Progress_Indicator(std::string text, long long current, long long total) {
     std::cout << (current != 0 ?  "\r\033[F" : "" ) << text << ": ";
     int percent = current * 100 / total;
     if (percent == 100)

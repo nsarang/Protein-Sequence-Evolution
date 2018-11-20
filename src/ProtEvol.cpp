@@ -21,6 +21,7 @@
 #include <sstream>
 #include <set>
 #include <iomanip>
+#include "protein.h"
 #include "constants.h"
 #include "cpplocate.h"
 #include "statistics.h"

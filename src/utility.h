@@ -19,6 +19,7 @@
 
 
 // TYPE DEFINITIONS
+/*
 struct AminoAcid {
     AminoAcid(std::string iname, double x = 0, double y = 0, double z = 0,
               int count = 0)
@@ -28,18 +29,18 @@ struct AminoAcid {
     int neighbour_count;
     std::tuple<double, double, double> cords;
 };
-
+*/
 
 
 
 // FUNCTIONS
-void ParsePDB(std::string fPath, std::vector<AminoAcid> &vecAminoAcid);
+ // void ParsePDB(std::string fPath, std::vector<AminoAcid> &vecAminoAcid);
 
 double dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2);
 
 bool IsStandardAA(std::string abrv);
 
-void progress_indicator(std::string text, long long current, long long total);
+void Progress_Indicator(std::string text, long long current, long long total);
 
 int system_call_err(std::string command, std::string& stdout);
 

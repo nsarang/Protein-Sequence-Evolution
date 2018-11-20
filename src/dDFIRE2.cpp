@@ -43,7 +43,7 @@ void DFIRE2::ReadLib(std::string libPath) {
 		int id1 = atom_map[atomtype1],
 		    id2 = atom_map[atomtype2];
 
-		if (id1 > num_types || id2 > num_types)
+		if (id1 > nTypes || id2 > nTypes)
 			throw std::runtime_error("Something wrong with the energy file\n");
 
 		for (int i = 0; i < num_bins; ++i) {

@@ -10,3 +10,7 @@ main:
 
 clean: 
 	$(MAKE) -C src clean
+
+
+new:
+	$(MAKE) -C src new
