@@ -34,7 +34,7 @@ std::array<std::array<long long, 7>, 20> amino_acid_burial_count,
 
 void ProteinProfile::CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS,
                                        bool bSave_Frags, int potS_Param) {
-    std::vector<std::function<void(std::tuple<Protein>&)> > vecProcFuncs;
+    std::vector<std::function<void(Protein&)> > vecProcFuncs;
     std::vector<std::function<void()> > vecCalcFuncs;
 
     if (bAlgn) {
@@ -53,11 +53,7 @@ void ProteinProfile::CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, boo
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_SS_Profile, this));
     }
 
-    std::vector<std::tuple<Protein> > vecTupleInsts;
-    for (auto& protein : _vecHomologous_Proteins)
-        vecTupleInsts.emplace_back(protein);
-
-    Thread_Manager(vecProcFuncs, vecTupleInsts);
+    Thread_Manager(vecProcFuncs, _vecHomologous_Proteins);
     for (auto& CalcFunction : vecCalcFuncs)
         CalcFunction();
 }
@@ -71,7 +67,7 @@ void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB,
 
     _dScore_CutOff = dCutOff;
 
-    std::vector<std::function<void(std::tuple<std::string>&)> > vecProcs;
+    std::vector<std::function<void(std::string&)> > vecProcs;
     vecProcs.push_back(std::bind(&ProteinProfile::Process_IsHomologue, this, _1));
     Thread_Manager(vecProcs, vecDB, bVerbose, "Finding homologous proteins");
 }
@@ -120,8 +116,7 @@ void ProteinProfile::Processing_Thread(std::vector<std::function<FuncType> > vec
 }
 
 
-void ProteinProfile::Process_IsHomologue(std::tuple<std::string>& tArgs) {
-    auto [fPath] = tArgs;
+void ProteinProfile::Process_IsHomologue(std::string fPath) {
     std::string stdout, line, algn_line1, algn_line2;
 
     while (system_call_err(ex_TMALIGN + " " + _refProtein.fPath + "  " + fPath + " -a 2>&1", stdout) != 0);
@@ -144,12 +139,11 @@ void ProteinProfile::Process_IsHomologue(std::tuple<std::string>& tArgs) {
         ret >> atom_dist[i];
 
     _vecTupleAlignments.emplace_back(score, algn_line1, algn_line2, atom_dist);
-    _vecHomologous_Proteins.emplace_back(fPath);
+    _vecHomologous_Proteins.emplace_back(Protein(fPath));
 }
 
 
-void ProteinProfile::Process_Solvent(std::tuple<Protein>& tArgs) {
-    auto& [target] = tArgs;
+void ProteinProfile::Process_Solvent(Protein& target) {
     int n = target.length();
     std::vector<int> neighbours( n );
 
@@ -178,8 +172,7 @@ void ProteinProfile::Process_Solvent(std::tuple<Protein>& tArgs) {
 }
 
 
-void ProteinProfile::Process_Pot_AAFreq(std::tuple<Protein>& tArgs) {
-    auto& [target] = tArgs;
+void ProteinProfile::Process_Pot_AAFreq(Protein& target) {
     std::array<double, 20> AA_freq{}, pot_r, pot0, pot1{}, var0;
     int n = target.length();
 
@@ -219,8 +212,7 @@ void ProteinProfile::Process_Pot_AAFreq(std::tuple<Protein>& tArgs) {
 }
 
 
-void ProteinProfile::Process_SS(std::tuple<Protein>& tArgs) {
-    auto [target] = tArgs;
+void ProteinProfile::Process_SS(Protein& target) {
     std::string stdout, line, prev_line;
 
     while (system_call_err(ex_STRIDE + " -o " + target.fPath + " 2>&1", stdout) != 0);
@@ -263,7 +255,6 @@ void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, int nGap_Scor
                          + sum_dist[i - 1];
 
 
-        // std::lock_guard<std::mutex> lock(al_mtx_1);
         for (int i = 0, pos = 0; i < align_len; ++i) {
             if (seq1[i] == '-')
                 continue;
@@ -298,7 +289,6 @@ void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, int nGap_Scor
                             fragment += seq2[j];
                             nFragLen++;
                         }
-                        // std::lock_guard<std::mutex> lock(al_mtx_2);
                         _matFragments[pos][pos + nFragLen - 1].push_back(fragment);
                     }
                 }
