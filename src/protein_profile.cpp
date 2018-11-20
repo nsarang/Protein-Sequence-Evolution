@@ -53,7 +53,11 @@ void ProteinProfile::CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, boo
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_SS_Profile, this));
     }
 
-    Thread_Manager(vecProcFuncs, _vecHomologous_Proteins);
+    std::vector<std::tuple<Protein> > vecTupleInsts;
+    for (auto& protein : _vecHomologous_Proteins)
+        vecTupleInsts.emplace_back(protein);
+
+    Thread_Manager(vecProcFuncs, vecTupleInsts);
     for (auto& CalcFunction : vecCalcFuncs)
         CalcFunction();
 }
@@ -103,9 +107,9 @@ void ProteinProfile::Thread_Manager(std::vector<std::function<FuncType> > vecFun
 }
 
 
-template<class FuncType, class C>
+template<class FuncType, class Args>
 void ProteinProfile::Processing_Thread(std::vector<std::function<FuncType> > vecFuncs,
-                                       std::vector<C> vecBatch, int& nCount_Now)
+                                       std::vector<Args> vecBatch, int& nCount_Now)
 {
     for (auto data : vecBatch) {
         for (auto ProcFunction : vecFuncs)
@@ -248,14 +252,14 @@ void ProteinProfile::Process_SS(std::tuple<Protein>& tArgs) {
 }
 
 
-void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags) {
+void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, int nGap_Score, int nDist_CutOff, int nMin_Frag) {
     for (auto&[score, seq1, seq2, atom_dist] : _vecTupleAlignments) {
 
         int align_len = seq1.length();
         std::vector<double> sum_dist( align_len + 1 );
 
         for (int i = 1; i <= align_len; ++i)
-            sum_dist[i] = (atom_dist[i] == GAP_SCORE ? GAP_PENALTY : atom_dist[i])
+            sum_dist[i] = (atom_dist[i] == nGap_Score ? GAP_PENALTY : atom_dist[i])
                          + sum_dist[i - 1];
 
 
@@ -279,12 +283,12 @@ void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags) {
         if (bSave_Frags) {
             int pos = 0;
             for (int i = 0; i < align_len; ++i) {
-                for (int l = FRAG_MIN_LEN; i + l <= align_len; ++l) {
+                for (int l = nMin_Frag; i + l <= align_len; ++l) {
                     if (atom_dist[i + 1] == 0 || atom_dist[i + l] == 0)
                         continue;
                     double sc = sum_dist[i + l] - sum_dist[i];
                     assert(sc > 0);
-                    if (sc <= l * DIST_CUTOFF) // hit
+                    if (sc <= l * nDist_CutOff) // hit
                     {
                         std::string fragment;
                         int nFragLen = 0;

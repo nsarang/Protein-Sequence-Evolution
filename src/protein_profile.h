@@ -49,7 +49,8 @@ private:
 	void Calculate_Solvent_Profile();
 	void Calculate_SS_Profile();
 	void Calculate_Pot_AAFreq_Profile();
-	void Calculate_Alignment_Profile(bool bSave_Fragments);
+	void Calculate_Alignment_Profile(bool bSave_Frags, int nGap_Score = GAP_SCORE,
+	                                 int nDist_CutOff = DIST_CUTOFF, int nMin_Frag = FRAG_MIN_LEN);
 	void Process_IsHomologue(std::tuple<std::string>& tArgs);
 	void Process_Solvent(std::tuple<Protein>& tArgs);
 	void Process_Pot_AAFreq(std::tuple<Protein>& tArgs);
