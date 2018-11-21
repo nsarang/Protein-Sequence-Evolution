@@ -3,11 +3,12 @@
 
 
 Protein::Protein(std::string fPath, bool bDist, bool bSolv, bool bSec)
-    : fPath( fPath ), md5( File_md5(fPath) )
+    : fPath( fPath ), md5( File_md5(fPath) ), bDist_Rdy( bDist ), bSolv_Rdy( bSolv ), bSS_Rdy( bSec )
 {
     Parse_PDB(fPath, vecAmino_Acid);
     for (auto& amino_acid : vecAmino_Acid)
         sequence += amino_acid.symbol;
+    
     if (bDist)
         Calculate_Distances();
     if (bSolv)
@@ -70,6 +71,11 @@ void Protein::Calculate_Distances() {
 
 
 void Protein::Calculate_Solvent() {
+    if (bDist_Rdy == false) {
+        Calculate_Distances();
+        bDist_Rdy = true;
+    }
+    bSolv_Rdy = true;
     int n = sequence.length();
     std::vector<int> neighbours( n );
 
@@ -81,10 +87,6 @@ void Protein::Calculate_Solvent() {
             }
 
     for (int i = 0; i < n; ++i) {
-        auto& amino_acid = vecAmino_Acid[i];
-        if (!IsStandardAA(amino_acid.name))
-            continue;
-
         int class_num = std::upper_bound(solvent_classes.begin(), solvent_classes.end(),
                                          neighbours[i]) - solvent_classes.begin();
 

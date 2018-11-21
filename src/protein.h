@@ -42,7 +42,7 @@ public:
 	double CA_Atom_Distance(int i, int j);
 	int length();
 	char operator[](int i);
-	
+
 	void Calculate_Distances();
 	void Calculate_Solvent();
 	void Calculate_SS();
@@ -51,6 +51,8 @@ private:
 	std::string sequence,
 	    fPath,
 	    md5;
+
+	bool bDist_Rdy, bSolv_Rdy, bSS_Rdy;
 	std::vector<AminoAcid> vecAmino_Acid;
 	std::vector<std::vector<double > > vecAtom_Distance;
 	std::vector<int> aSolvent_Accessibility, sSecondary_Structure;
