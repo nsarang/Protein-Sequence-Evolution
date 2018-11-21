@@ -29,11 +29,17 @@
 
 class ProteinProfile {
 public:
-	ProteinProfile(Protein target, std::vector<std::string> vecDatabase);
-	void CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot,
-	                       bool bSS, bool bSave_Frags, int potS_Param);
+	ProteinProfile(Protein target, std::vector<std::string> vecDatabase, bool calcProfiles);
+	void CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS, bool bVerbose = true,
+	                       bool bSave_Frags = true, int potS_Param = Pot_S_Constant, 
+	                       int dDist_CutOff = DIST_CUTOFF, int dGap_Score = GAP_SCORE,
+	                       int nMin_Frag = FRAG_MIN_LEN);
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
 	                              double dCutOff, double bVerbose);
+	void Read_FromFile(std::string sParentDirectory = db_Profiles);
+	void Write_ToFile(bool bWriteCounts = false);
+	std::string QuickInfo();
+
 
 private:
 	template<class FuncType, class vecType>
@@ -49,31 +55,35 @@ private:
 	void Calculate_Solvent_Profile();
 	void Calculate_SS_Profile();
 	void Calculate_Pot_AAFreq_Profile();
-	void Calculate_Alignment_Profile(bool bSave_Frags, int nGap_Score = GAP_SCORE,
-	                                 int nDist_CutOff = DIST_CUTOFF, int nMin_Frag = FRAG_MIN_LEN);
+	void Calculate_Alignment_Profile(bool bSave_Frags, double dGap_Score,
+	                                 double dDist_CutOff, int nMin_Frag);
 	void Process_IsHomologue(std::string fPath);
-	void Process_Solvent(Protein& tArgs);
-	void Process_Pot_AAFreq(Protein& tArgs);
-	void Process_SS(Protein& tArgs);
+	void Process_Solvent(Protein& target);
+	void Process_Pot_AAFreq(Protein& target);
+	void Process_SS(Protein& target);
+	std::string RelativeFileName(std::string sProfile_Name);
 
 
-	Protein _refProtein;
-	bool _dScore_CutOff;
-	std::vector<Protein> _vecHomologous_Proteins;
+	Protein _refProtein; // Target protein
+	double _dScore_CutOff, _dDist_CutOff, _dGap_Score; // Alignment parameters
+	int _potS_Param, _nMin_Frag;
+	bool bAlgn_Rdy{ false }, bFrags_Rdy{ false }, bSolvent_Rdy{ false }, bSS_Rdy{ false }, bPot_Rdy { false };
+	
+	std::vector<Protein> _vecHomologous_Proteins; // Protein with homologous structures extracted from CATH
 	std::array<std::array<double, 7>, 20> _aSolvent_Profile, _aSec_Profile;
+	std::array<double, 20> _aPot_Bar, _aPot_Stdev, _aAA_Freq_Mean, _aAA_Freq_Stdev;
 	std::vector<std::array<double, 7> > _aAlgn_Profile;
-	std::vector<std::vector<std::vector<std::string> > > _matFragments;
+	
+	std::vector<std::vector<std::vector<std::string> > > _matFragments; // Alignment fragments
 	std::vector<std::tuple<double, std::string, std::string, std::vector<double> >> _vecTupleAlignments;
-	int _potS_Param;
 
-
+	// Objects used in preprocessing
 	std::array<std::array<long long, 7>, 20> _aSolvent_AA_Count, _aSec_AA_Count;
 	std::array<std::vector<double>, 20> _vecPotScores, _vecAA_Freqs;
 	std::array<long long, 20> _aAA_Total_Count;
 	std::vector<long long> _aAlgn_Position_Count;
 	std::array<long long, 7> _aAlgn_Class_Count;
-
-	std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot;
+	std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot; // Mutexs used in threads
 };
 
 
