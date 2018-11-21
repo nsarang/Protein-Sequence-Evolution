@@ -28,6 +28,8 @@
 
 
 class ProteinProfile {
+	friend class Evaluator;
+	
 public:
 	ProteinProfile(Protein target, std::vector<std::string> vecDatabase, bool calcProfiles);
 	void CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS, bool bVerbose = true,

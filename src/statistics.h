@@ -6,11 +6,12 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
+#include <tuple>
 #include "constants.h"
 
 
 
-void Mean_SD(std::vector<double> &vec, double &ret_mean, double &ret_stdev);
+std::tuple<double, double> Mean_SD(std::vector<double> &vec);
 
 std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double coef = 1.5);
 

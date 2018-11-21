@@ -17,8 +17,7 @@ class DFIRE2 {
 public:
 	DFIRE2(std::string libPath);
 	void ReadLib(std::string libPath);
-	double Calculate_CFE(std::string& target_sequence,
-	                     std::array<std::array<double, MAX_PROT_LEN>, MAX_PROT_LEN> &target_atom_distance);
+	double Calc_CFE(Protein& target);
 private:
 	int nTypes, nBins;
 	bool libReady;

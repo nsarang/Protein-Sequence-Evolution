@@ -10,8 +10,8 @@ ALL.CPP = ProtEvol.cpp cpplocate.cpp statistics.cpp utility.cpp db_process.cpp m
 all: $(ALL.O)
 	$(CC) -o ../ProteinSequenceEvolution $(ALL.O) $(LDFLAGS)
 
-new: protein.o protein_profile.o
-	$(CC) -o ../NewEvol protein.o protein_profile.o $(LDFLAGS)
+new: protein.o protein_profile.o evaluator.o
+	$(CC) -o ../NewEvol protein.o protein_profile.o evaluator.o $(LDFLAGS)
 
 protein.o: protein.cpp protein.h
 	$(CC) $(CFLAGS) protein.cpp
@@ -19,6 +19,8 @@ protein.o: protein.cpp protein.h
 protein_profile.o: protein_profile.cpp protein_profile.h
 	$(CC) $(CFLAGS) protein_profile.cpp
 
+evaluator.o: evaluator.cpp evaluator.h
+	$(CC) $(CFLAGS) evaluator.cpp
 
 cpplocate.o: cpplocate.cpp cpplocate.h
 	$(CC) $(CFLAGS) cpplocate.cpp
@@ -50,10 +52,6 @@ dDFIRE2.o: dDFIRE2.cpp dDFIRE2.h
 
 init.o: init.cpp init.h
 	$(CC) $(CFLAGS) init.cpp
-
-
-evaluation.o: evaluation.cpp evaluation.h
-	$(CC) $(CFLAGS) evaluation.cpp
 
 
 ai.o: ai.cpp ai.h

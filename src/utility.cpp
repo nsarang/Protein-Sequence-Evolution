@@ -1,12 +1,24 @@
 #include "utility.h"
-#include <iostream>
-#include <fstream>
-#include <array>
-#include <algorithm>
-#include "cpplocate.h"
 
 
 
+void CATH_ListFiles(std::string path) {
+    if (db_protein_list.empty()) {
+        DIR *hDir;
+        dirent *hFile;
+        assert(hDir = opendir(path.c_str()));
+        int total = stoi(system_call("ls " + path + " | wc -l"));
+
+        db_protein_list.reserve(total);
+        while ((hFile = readdir(hDir))) {
+            std::string fName = hFile->d_name;
+            if (fName.size() != 7 || !isdigit(fName[0]))
+                continue;
+
+            db_protein_list.push_back(path + fName);
+        }
+    }
+}
 
 
 double dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2) {
@@ -22,30 +34,6 @@ bool IsStandardAA(std::string abrv)
     return !(abrv == "ASX" || abrv == "GLX" || abrv == "SEC" || abrv == "PYL" || abrv == "UNK");
 }
 
-/*
-void ParsePDB(std::string fPath, std::vector<AminoAcid> &vecAminoAcid) {
-    vecAminoAcid.clear();
-    std::ifstream inFile(fPath);
-    std::string line;
-
-     while (getline(inFile, line)) {
-        if (line.size() < 47 || line.substr(0, 4) != "ATOM")
-            continue;
-
-        std::string atom_name = trim(line.substr(12, 4));
-        if (atom_name != "CA" || !(line[16] == 'A' || line[16] == ' ' || line[16] == '1'))
-            continue;
-
-        vecAminoAcid.emplace_back(AminoAcid(
-                                         line.substr(17, 3),
-                                         std::stod(trim(line.substr(30, 8))),
-                                         std::stod(trim(line.substr(38, 8))),
-                                         std::stod(trim(line.substr(46, 8)))
-                                     ));
-        assert(residue_map.count(vecAminoAcid.back().name) > 0);
-    }
-}
-*/
 
 void Progress_Indicator(std::string text, long long current, long long total) {
     std::cout << (current != 0 ?  "\r\033[F" : "" ) << text << ": ";

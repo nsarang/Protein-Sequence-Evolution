@@ -1,7 +1,8 @@
 #include "statistics.h"
 
 
-void Mean_SD(std::vector<double> &vec, double &ret_mean, double &ret_stdev) {
+std::tuple<double, double> Mean_SD(std::vector<double> &vec) {
+    double ret_mean, ret_stdev;
     /*
     double sum = 0, sq_sum = 0;
     int n = vec.size();
@@ -18,6 +19,7 @@ void Mean_SD(std::vector<double> &vec, double &ret_mean, double &ret_stdev) {
 
     ret_mean = gsl_stats_mean(vec.data(), 1, vec.size());
     ret_stdev = gsl_stats_sd_m(vec.data(), 1, vec.size(), ret_mean);
+    return std::tuple(ret_mean, ret_stdev);
 }
 
 
