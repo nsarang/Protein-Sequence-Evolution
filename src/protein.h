@@ -43,7 +43,9 @@ public:
 
 private:
 	void Calculate_Distances();
-	std::string sequence, fPath;
+	std::string sequence,
+	    fPath,
+	    md5;
 	std::vector<AminoAcid> vecAmino_Acid;
 	std::vector<std::vector<double > > vecAtom_Distance;
 

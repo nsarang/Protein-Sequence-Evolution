@@ -1,6 +1,6 @@
 #include "protein.h"
 
-Protein::Protein(std::string fPath) : fPath( fPath )
+Protein::Protein(std::string fPath) : fPath( fPath ), md5( File_md5(fPath) )
 {
     Parse_PDB(fPath, vecAmino_Acid);
     for (auto& amino_acid : vecAmino_Acid)
