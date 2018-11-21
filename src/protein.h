@@ -35,24 +35,25 @@ struct AminoAcid {
 class Protein {
 	friend class ProteinProfile;
 	friend class Evaluator;
-	
+
 public:
-	Protein(std::string fPath);
+	Protein(std::string fPath, bool bDist = false, bool bSolv = false, bool bSec = false);
 	static void Parse_PDB(std::string fPath, std::vector<AminoAcid>& retVec);
 	double CA_Atom_Distance(int i, int j);
 	int length();
 	char operator[](int i);
+	
+	void Calculate_Distances();
+	void Calculate_Solvent();
+	void Calculate_SS();
 
 private:
-	void Calculate_Distances();
 	std::string sequence,
 	    fPath,
 	    md5;
 	std::vector<AminoAcid> vecAmino_Acid;
 	std::vector<std::vector<double > > vecAtom_Distance;
 	std::vector<int> aSolvent_Accessibility, sSecondary_Structure;
-    
-
 };
 
 

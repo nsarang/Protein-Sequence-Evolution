@@ -6,7 +6,8 @@ using namespace std::placeholders;
 
 void ProteinProfile::CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS,
                                        bool bVerbose, bool bSave_Frags, int potS_Param,
-                                       int dDist_CutOff, int dGap_Score, int nMin_Frag) {
+                                       int dDist_CutOff, int dGap_Score, int nMin_Frag) 
+{
     std::vector<std::function<void(Protein&)> > vecProcFuncs;
     std::vector<std::function<void()> > vecCalcFuncs;
     std::string Msg = "Calculating ";

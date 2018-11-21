@@ -1,10 +1,19 @@
 #include "protein.h"
 
-Protein::Protein(std::string fPath) : fPath( fPath ), md5( File_md5(fPath) )
+
+
+Protein::Protein(std::string fPath, bool bDist, bool bSolv, bool bSec)
+    : fPath( fPath ), md5( File_md5(fPath) )
 {
     Parse_PDB(fPath, vecAmino_Acid);
     for (auto& amino_acid : vecAmino_Acid)
         sequence += amino_acid.symbol;
+    if (bDist)
+        Calculate_Distances();
+    if (bSolv)
+        Calculate_Solvent();
+    if (bSec)
+        Calculate_SS();
 }
 
 
@@ -28,7 +37,7 @@ void Protein::Parse_PDB(std::string fPath, std::vector<AminoAcid> &retVec) {
                                 std::stod(trim(line.substr(38, 8))),
                                 std::stod(trim(line.substr(46, 8)))
                             ));
-        
+
         retVec.back().symbol = resName_to_sym[retVec.back().name];
     }
 }
@@ -56,5 +65,58 @@ void Protein::Calculate_Distances() {
             double d = dist(vecAmino_Acid[i].cords, vecAmino_Acid[j].cords);
             vecAtom_Distance[i][j] = vecAtom_Distance[j][i] = d;
         }
+    }
+}
+
+
+void Protein::Calculate_Solvent() {
+    int n = sequence.length();
+    std::vector<int> neighbours( n );
+
+    for (int i = 0; i < n; ++i)
+        for (int j = i + 1; j < n; ++j)
+            if (CA_Atom_Distance(i, j) <= 14) {
+                neighbours[i]++;
+                neighbours[j]++;
+            }
+
+    for (int i = 0; i < n; ++i) {
+        auto& amino_acid = vecAmino_Acid[i];
+        if (!IsStandardAA(amino_acid.name))
+            continue;
+
+        int class_num = std::upper_bound(solvent_classes.begin(), solvent_classes.end(),
+                                         neighbours[i]) - solvent_classes.begin();
+
+        aSolvent_Accessibility[i] = class_num;
+    }
+}
+
+
+void Protein::Calculate_SS() {
+    std::string stdout, line, prev_line;
+
+    while (system_call_err(ex_STRIDE + " -o " + fPath + " 2>&1", stdout) != 0);
+    assert(stdout != "");
+    std::stringstream ret( stdout );
+
+    while (getline(ret, line)) {
+        if (line.substr(0, 3) == "STR") {
+            for (int i = 10; i < 60; ++i) {
+                if (isspace(prev_line[i]) || prev_line[i] == 'X')
+                    continue;
+                if (isspace(line[i]))
+                    line[i] = 'C';
+                if (line[i] == 'b')
+                    line[i] = 'B';
+
+                assert(sec_classes.count(line[i]) != 0);
+                sSecondary_Structure[i] = sec_classes[ line[i] ];
+            }
+        }
+        if (line.substr(0, 3) == "LOC")
+            return;
+
+        prev_line = line;
     }
 }
