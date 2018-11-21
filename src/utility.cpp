@@ -2,22 +2,22 @@
 
 
 
-void CATH_ListFiles(std::string path) {
-    if (db_protein_list.empty()) {
-        DIR *hDir;
-        dirent *hFile;
-        assert(hDir = opendir(path.c_str()));
-        int total = stoi(system_call("ls " + path + " | wc -l"));
+std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
+    std::vector<std::string> vecProcessedDB;
+    DIR *hDir;
+    dirent *hFile;
+    assert(hDir = opendir(sDB_Path.c_str()));
+    int total = stoi(system_call("ls " + sDB_Path + " | wc -l"));
 
-        db_protein_list.reserve(total);
-        while ((hFile = readdir(hDir))) {
-            std::string fName = hFile->d_name;
-            if (fName.size() != 7 || !isdigit(fName[0]))
-                continue;
+    vecProcessedDB.reserve(total);
+    while ((hFile = readdir(hDir))) {
+        std::string fName = hFile->d_name;
+        if (fName.size() != 7 || !isdigit(fName[0]))
+            continue;
 
-            db_protein_list.push_back(path + fName);
-        }
+        vecProcessedDB.push_back(sDB_Path + fName);
     }
+    return vecProcessedDB;
 }
 
 
@@ -130,7 +130,7 @@ std::string FileBasename(std::string filename) {
 std::string File_md5(std::string fName) {
     std::string md5 = "md5 -r ";
 #if defined(__linux__)
-        md5 = "md5sum";
+    md5 = "md5sum";
 #endif
     std::string ret = system_call("md5 -r " + fName);
     return ret.substr(0, ret.find(' '));

@@ -15,7 +15,6 @@
 #include <numeric>
 #include <sstream>
 #include <functional>
-#include <dirent.h>
 #include <unistd.h>
 #include <tuple>
 #include "mapping.h"
@@ -31,7 +30,7 @@ class ProteinProfile {
 	friend class Evaluator;
 	
 public:
-	ProteinProfile(Protein target, std::vector<std::string> vecDatabase, bool calcProfiles);
+	ProteinProfile(Protein target);
 	void CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS, bool bVerbose = true,
 	                       bool bSave_Frags = true, int potS_Param = Pot_S_Constant, 
 	                       int dDist_CutOff = DIST_CUTOFF, int dGap_Score = GAP_SCORE,
@@ -72,19 +71,19 @@ private:
 	bool bAlgn_Rdy{ false }, bFrags_Rdy{ false }, bSolvent_Rdy{ false }, bSS_Rdy{ false }, bPot_Rdy { false };
 	
 	std::vector<Protein> _vecHomologous_Proteins; // Protein with homologous structures extracted from CATH
-	std::array<std::array<double, 7>, 20> _aSolvent_Profile, _aSec_Profile;
-	std::array<double, 20> _aPot_Bar, _aPot_Stdev, _aAA_Freq_Mean, _aAA_Freq_Stdev;
+	std::array<std::array<double, 7>, 20> _aSolvent_Profile{ }, _aSec_Profile{ };
+	std::array<double, 20> _aPot_Bar{ }, _aPot_Stdev{ }, _aAA_Freq_Mean{ }, _aAA_Freq_Stdev{ };
 	std::vector<std::array<double, 7> > _aAlgn_Profile;
 	
 	std::vector<std::vector<std::vector<std::string> > > _matFragments; // Alignment fragments
 	std::vector<std::tuple<double, std::string, std::string, std::vector<double> >> _vecTupleAlignments;
 
 	// Objects used in preprocessing
-	std::array<std::array<long long, 7>, 20> _aSolvent_AA_Count, _aSec_AA_Count;
+	std::array<std::array<long long, 7>, 20> _aSolvent_AA_Count{ }, _aSec_AA_Count{ };
 	std::array<std::vector<double>, 20> _vecPotScores, _vecAA_Freqs;
-	std::array<long long, 20> _aAA_Total_Count;
-	std::vector<long long> _aAlgn_Position_Count;
-	std::array<long long, 7> _aAlgn_Class_Count;
+	std::array<long long, 20> _aAA_Total_Count{ };
+	std::vector<long long> _aAlgn_Position_Count{ };
+	std::array<long long, 7> _aAlgn_Class_Count{ };
 	std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot; // Mutexs used in threads
 };
 

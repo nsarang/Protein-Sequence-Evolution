@@ -12,6 +12,7 @@
 #include <array>
 #include <algorithm>
 #include <string>
+#include <dirent.h>
 #include "cpplocate.h"
 #include "mapping.h"
 
@@ -39,7 +40,7 @@ struct AminoAcid {
 
 
 // FUNCTIONS
-void CATH_ListFiles(std::string path);
+std::vector<std::string> CATH_ListFiles(std::string path);
 
 double dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2);
 

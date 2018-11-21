@@ -7,11 +7,18 @@ ALL.O = ProtEvol.o cpplocate.o statistics.o utility.o db_process.o mapping.o ali
 ALL.H = cpplocate.h statistics.h utility.h mapping.h db_process.h constants.h alignment.h dDFIRE2.h init.h evaluation.h ai.h protein.h
 ALL.CPP = ProtEvol.cpp cpplocate.cpp statistics.cpp utility.cpp db_process.cpp mapping.cpp alignment.cpp dDFIRE2.cpp init.cpp evaluation.cpp ai.cpp protein.cpp
 
+ALLN.O = driver.o protein.o protein_profile.o evaluator.o utility.o mapping.o dDFIRE2.o statistics.o
+ALLN.H = protein.h protein_profile.h evaluator.h utility.h mapping.h dDFIRE2.h statistics.h
+ALL.CPP = driver.cpp protein.cpp protein_profile.cpp evaluator.cpp utility.cpp mapping.cpp dDFIRE2.cpp statistics.cpp
+
 all: $(ALL.O)
 	$(CC) -o ../ProteinSequenceEvolution $(ALL.O) $(LDFLAGS)
 
-new: protein.o protein_profile.o evaluator.o
-	$(CC) -o ../NewEvol protein.o protein_profile.o evaluator.o $(LDFLAGS)
+new: $(ALLN.O)
+	$(CC) -o ../NewProtEvol $(ALLN.O) $(LDFLAGS)
+
+driver.o: driver.cpp $(ALLN.H)
+	$(CC) $(CFLAGS) driver.cpp
 
 protein.o: protein.cpp protein.h
 	$(CC) $(CFLAGS) protein.cpp

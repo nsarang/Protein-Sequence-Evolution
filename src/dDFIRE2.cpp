@@ -3,13 +3,13 @@
 
 // dDFIRE
 
-DFIRE2::DFIRE2(std::string libPath) {
-	ReadLib(libPath);
+DFIRE2::DFIRE2(std::string libPath, bool bVerbose) {
+	ReadLib(libPath, bVerbose);
 }
 
 
 
-void DFIRE2::ReadLib(std::string libPath) {
+void DFIRE2::ReadLib(std::string libPath, bool bVerbose) {
 	if (!FileExists(libPath))
 		throw std::runtime_error("ERR: dDFIRE energy file not found!");
 
@@ -33,8 +33,8 @@ void DFIRE2::ReadLib(std::string libPath) {
 
 
 	while (libFile >> AA_name1 >> atom1 >> AA_name2 >> atom2) {
-		atomtype1 = std::string() + residue_map[AA_name1] + " " + atom1;
-		atomtype2 = std::string() + residue_map[AA_name2] + " " + atom2;
+		atomtype1 = std::string() + resName_to_sym[AA_name1] + " " + atom1;
+		atomtype2 = std::string() + resName_to_sym[AA_name2] + " " + atom2;
 		if (atom_map.count(atomtype1) == false)
 			atom_map[atomtype1] = pos++;
 		if (atom_map.count(atomtype2) ==
@@ -50,9 +50,11 @@ void DFIRE2::ReadLib(std::string libPath) {
 			libFile >> edDFIRE[id1][id2][i];     // 30 bins of energy
 			edDFIRE[id2][id1][i] = edDFIRE[id1][id2][i];  // symmetry
 		}
-		progress_indicator("dDFIRE energy file", count_now++, total);
+		if (bVerbose)
+			Progress_Indicator("dDFIRE energy file", count_now++, total);
 	}
-	progress_indicator("dDFIRE energy file", 1, 1);
+	if (bVerbose)
+		Progress_Indicator("dDFIRE energy file", 1, 1);
 	libReady = true;
 }
 

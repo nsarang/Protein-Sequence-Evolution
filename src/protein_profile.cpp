@@ -2,6 +2,21 @@
 using namespace std::placeholders;
 
 
+ProteinProfile::ProteinProfile(Protein target)
+    : _refProtein ( target )
+{
+    _aAlgn_Profile.resize(_refProtein.length());
+    _matFragments.resize(_refProtein.length(), std::vector<std::vector<std::string> >( _refProtein.length() ));
+    for (int i = 0; i < 20; ++i) {
+        for (int j = 0; j < 7; ++j)
+        {
+            assert(_aSolvent_Profile[i][j] == 0);
+            assert(_aSec_Profile[i][j] == 0);
+            assert(_aSolvent_AA_Count[i][j] == 0);
+            assert(_aSec_AA_Count[i][j] == 0);
+        }
+    }
+}
 
 
 void ProteinProfile::CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS,
@@ -9,7 +24,7 @@ void ProteinProfile::CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, boo
                                        int dDist_CutOff, int dGap_Score, int nMin_Frag)
 {
     if (_vecHomologous_Proteins.empty()) {
-        std::cerr << "ERR: No protein to process.";
+        std::cerr << "FatalError: No protein to process.";
         return;
     }
 
@@ -548,4 +563,3 @@ std::string ProteinProfile::RelativeFileName(std::string sPN) {
 
     throw std::runtime_error("Unknown profile name.");
 }
-
