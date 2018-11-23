@@ -36,10 +36,10 @@ bool IsStandardAA(std::string abrv)
 
 
 void Progress_Indicator(std::string text, long long current, long long total) {
-    std::cout << (current != 0 ?  "\r\033[F" : "" ) << text << ": ";
+    std::cout << "\r\033[F" << text << ": ";
     int percent = current * 100 / total;
     if (percent == 100)
-        std::cout << BOLDGREEN << "OK " << RESET << std::endl;
+        std::cout << BOLDGREEN << "OK" << RESET << std::endl;
     else
         std::cout << BOLDRED << percent << "%" << RESET << std::endl;
 }
@@ -49,7 +49,9 @@ int system_call_err(std::string command, std::string& stdout) {
     std::array<char, BUFFERSIZE> buffer;
 
     FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) throw std::runtime_error("popen() failed!\ncommand: " + command);
+    if (!pipe) {
+        throw std::runtime_error(std::string() + "popen() failed!:\t" + strerror(errno) + "\ncommand: " + command);
+    }
     try {
         while (!feof(pipe))
             if (fgets(buffer.data(), BUFFERSIZE, pipe) != NULL)
@@ -59,6 +61,7 @@ int system_call_err(std::string command, std::string& stdout) {
         throw;
     }
     int wstat = pclose(pipe);
+    pclose(pipe);
     return WEXITSTATUS(wstat);
 }
 
@@ -68,7 +71,9 @@ std::string system_call(std::string command) {
     std::string result = "";
 
     FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) throw std::runtime_error("popen() failed!\ncommand: " + command);
+    if (!pipe) {
+        throw std::runtime_error(std::string() + "popen() failed!:\t" + strerror(errno) + "\ncommand: " + command);
+    }
     try {
         while (!feof(pipe))
             if (fgets(buffer.data(), BUFFERSIZE, pipe) != NULL)
@@ -128,11 +133,11 @@ std::string FileBasename(std::string filename) {
 
 
 std::string File_md5(std::string fName) {
-    std::string md5 = "md5 -r ";
 #if defined(__linux__)
-    md5 = "md5sum";
+    std::string ret = subprocess::check_output({"md5sum", fName.c_str()}).buf.data();
+#else
+    std::string ret = subprocess::check_output({"md5", "-r", fName.c_str()}).buf.data();
 #endif
-    std::string ret = system_call("md5 -r " + fName);
     return ret.substr(0, ret.find(' '));
 }
 

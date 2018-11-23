@@ -118,7 +118,7 @@ double Evaluator::Secondary_Struct(Protein& target,
             continue;
         }
         int idx = sym_to_idx[target[i]];
-        score += aProfile[idx][ target.sSecondary_Structure[i] ];
+        score += aProfile[idx][ target.aSecondary_Structure[i] ];
     }
     return score / (n - excluded);
 }

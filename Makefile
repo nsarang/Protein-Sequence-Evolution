@@ -1,5 +1,5 @@
 all: 
-	$(MAKE) -C src
+	$(MAKE) -C src all
 	$(MAKE) -C STRIDE/src
 	$(MAKE) -C TMalign/src
 
@@ -10,7 +10,3 @@ main:
 
 clean: 
 	$(MAKE) -C src clean
-
-
-new:
-	$(MAKE) -C src new

@@ -3,12 +3,12 @@
 
 
 Protein::Protein(std::string fPath, bool bDist, bool bSolv, bool bSec)
-    : fPath( fPath ), md5( File_md5(fPath) ), bDist_Rdy( bDist ), bSolv_Rdy( bSolv ), bSS_Rdy( bSec )
+    : fPath( fPath ), md5( File_md5(fPath) )
 {
     Parse_PDB(fPath, vecAmino_Acid);
     for (auto& amino_acid : vecAmino_Acid)
         sequence += amino_acid.symbol;
-    
+
     if (bDist)
         Calculate_Distances();
     if (bSolv)
@@ -50,6 +50,8 @@ int Protein::length() {
 
 
 double Protein::CA_Atom_Distance(int i, int j) {
+    if (bDist_Rdy == false)
+        throw;
     return vecAtom_Distance[i][j];
 }
 
@@ -60,23 +62,25 @@ char Protein::operator[](int i) {
 
 
 void Protein::Calculate_Distances() {
-    for (int i = 0; i < vecAmino_Acid.size(); ++i) {
-        for (int j = i + 1; j < vecAmino_Acid.size(); ++j)
+    vecAtom_Distance.resize( length(), std::vector<double>(length()) );
+
+    for (int i = 0; i < length(); ++i) {
+        for (int j = i + 1; j < length(); ++j)
         {
             double d = dist(vecAmino_Acid[i].cords, vecAmino_Acid[j].cords);
             vecAtom_Distance[i][j] = vecAtom_Distance[j][i] = d;
         }
     }
+    bDist_Rdy = true;
 }
 
 
 void Protein::Calculate_Solvent() {
-    if (bDist_Rdy == false) {
+    if (bDist_Rdy == false)
         Calculate_Distances();
-        bDist_Rdy = true;
-    }
-    bSolv_Rdy = true;
-    int n = sequence.length();
+
+    int n = length();
+    aSolvent_Accessibility.resize( n );
     std::vector<int> neighbours( n );
 
     for (int i = 0; i < n; ++i)
@@ -92,19 +96,23 @@ void Protein::Calculate_Solvent() {
 
         aSolvent_Accessibility[i] = class_num;
     }
+    bSolv_Rdy = true;
 }
 
 
 void Protein::Calculate_SS() {
+    aSecondary_Structure.resize( length() );
     std::string stdout, line, prev_line;
 
-    while (system_call_err(ex_STRIDE + " -o " + fPath + " 2>&1", stdout) != 0);
-    assert(stdout != "");
-    std::stringstream ret( stdout );
+    auto oBuffer = subprocess::check_output({ex_STRIDE.c_str(), "-o", fPath.c_str()});
+    std::stringstream ret(oBuffer.buf.data());
 
+    int pos = 0;
     while (getline(ret, line)) {
         if (line.substr(0, 3) == "STR") {
             for (int i = 10; i < 60; ++i) {
+                assert(isalpha(line[i]) || isspace(line[i]));
+                
                 if (isspace(prev_line[i]) || prev_line[i] == 'X')
                     continue;
                 if (isspace(line[i]))
@@ -113,7 +121,7 @@ void Protein::Calculate_SS() {
                     line[i] = 'B';
 
                 assert(sec_classes.count(line[i]) != 0);
-                sSecondary_Structure[i] = sec_classes[ line[i] ];
+                aSecondary_Structure[pos++] = sec_classes[ line[i] ];
             }
         }
         if (line.substr(0, 3) == "LOC")
@@ -121,4 +129,6 @@ void Protein::Calculate_SS() {
 
         prev_line = line;
     }
+    bSS_Rdy = true;
 }
+

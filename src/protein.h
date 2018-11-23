@@ -47,15 +47,15 @@ public:
 	void Calculate_Solvent();
 	void Calculate_SS();
 
-private:
+//private:
 	std::string sequence,
 	    fPath,
 	    md5;
 
-	bool bDist_Rdy, bSolv_Rdy, bSS_Rdy;
+	bool bDist_Rdy{ false }, bSolv_Rdy{ false }, bSS_Rdy{ false };
 	std::vector<AminoAcid> vecAmino_Acid;
 	std::vector<std::vector<double > > vecAtom_Distance;
-	std::vector<int> aSolvent_Accessibility, sSecondary_Structure;
+	std::vector<int> aSolvent_Accessibility, aSecondary_Structure;
 };
 
 

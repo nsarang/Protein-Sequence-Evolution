@@ -13,8 +13,11 @@
 #include <algorithm>
 #include <string>
 #include <dirent.h>
+#include <cerrno>
+#include <cstring>
 #include "cpplocate.h"
 #include "mapping.h"
+#include "subprocess.hpp"
 
 
 #define RESET   "\033[0m"

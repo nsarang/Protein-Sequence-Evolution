@@ -28,18 +28,18 @@
 
 class ProteinProfile {
 	friend class Evaluator;
-	
+
 public:
 	ProteinProfile(Protein target);
 	void CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS, bool bVerbose = true,
-	                       bool bSave_Frags = true, int potS_Param = Pot_S_Constant, 
-	                       int dDist_CutOff = DIST_CUTOFF, int dGap_Score = GAP_SCORE,
+	                       bool bSave_Frags = true, int potS_Param = Pot_S_Constant,
+	                       double dFrag_Score_Cutoff = DIST_CUTOFF, double dGap_Score = GAP_SCORE,
 	                       int nMin_Frag = FRAG_MIN_LEN);
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
-	                              double dCutOff, double bVerbose);
+	                              double dAlgn_Score_CutOff, double bVerbose);
 	void Read_FromFile(std::string sParentDirectory = db_Profiles);
 	void Write_ToFile(bool bWriteCounts = false);
-	std::string QuickInfo();
+	std::string QuickInfo(bool bIncludeAlignment = false);
 
 
 private:
@@ -56,8 +56,8 @@ private:
 	void Calculate_Solvent_Profile();
 	void Calculate_SS_Profile();
 	void Calculate_Pot_AAFreq_Profile();
-	void Calculate_Alignment_Profile(bool bSave_Frags, double dGap_Score,
-	                                 double dDist_CutOff, int nMin_Frag);
+	void Calculate_Alignment_Profile(bool bSave_Frags, double dFrag_Score_Cutoff,
+	                                 double dGap_Score, int nMin_Frag);
 	void Process_IsHomologue(std::string fPath);
 	void Process_Solvent(Protein& target);
 	void Process_Pot_AAFreq(Protein& target);
@@ -66,15 +66,15 @@ private:
 
 
 	Protein _refProtein; // Target protein
-	double _dScore_CutOff, _dDist_CutOff, _dGap_Score; // Alignment parameters
+	double _dAlgn_Score_CutOff, _dFrag_Score_Cutoff, _dGap_Score; // Alignment parameters
 	int _potS_Param, _nMin_Frag;
 	bool bAlgn_Rdy{ false }, bFrags_Rdy{ false }, bSolvent_Rdy{ false }, bSS_Rdy{ false }, bPot_Rdy { false };
-	
+
 	std::vector<Protein> _vecHomologous_Proteins; // Protein with homologous structures extracted from CATH
 	std::array<std::array<double, 7>, 20> _aSolvent_Profile{ }, _aSec_Profile{ };
 	std::array<double, 20> _aPot_Bar{ }, _aPot_Stdev{ }, _aAA_Freq_Mean{ }, _aAA_Freq_Stdev{ };
 	std::vector<std::array<double, 7> > _aAlgn_Profile;
-	
+
 	std::vector<std::vector<std::vector<std::string> > > _matFragments; // Alignment fragments
 	std::vector<std::tuple<double, std::string, std::string, std::vector<double> >> _vecTupleAlignments;
 
@@ -84,7 +84,7 @@ private:
 	std::array<long long, 20> _aAA_Total_Count{ };
 	std::vector<long long> _aAlgn_Position_Count{ };
 	std::array<long long, 7> _aAlgn_Class_Count{ };
-	std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot; // Mutexs used in threads
+	std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot, _mtx_algn; // Mutexs used in threads
 };
 
 

@@ -22,19 +22,22 @@ std::tuple<double, double> Mean_SD(std::vector<double> &vec) {
     return std::tuple(ret_mean, ret_stdev);
 }
 
-
+#include <iostream>
+#include <cassert>
 std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double coef) {
+    assert(vecInp.size());
     int Q1, Q2, Q3;
     Q1 = vecInp.size() / 4;
     Q2 = vecInp.size() / 2;
     Q3 = Q1 + Q2;
-
+    std::cerr << "IQR " << Q1 << " " << Q2 << " " << Q3 << "\n";
     std::sort(vecInp.begin(), vecInp.end());
     double IQR = vecInp[Q3] - vecInp[Q1];
 
     auto low = std::lower_bound(vecInp.begin(), vecInp.end(), vecInp[Q1] - coef * IQR);
     auto up = std::upper_bound(vecInp.begin(), vecInp.end(), vecInp[Q3] + coef * IQR);
-    return std::vector<double>(low, up);
+    std::cerr << "Passed\n";
+    return std::vector(low, up);
 }
 
 
