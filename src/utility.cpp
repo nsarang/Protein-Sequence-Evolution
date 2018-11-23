@@ -39,7 +39,7 @@ void Progress_Indicator(std::string text, long long current, long long total) {
     std::cout << "\r\033[F" << text << ": ";
     int percent = current * 100 / total;
     if (percent == 100)
-        std::cout << BOLDGREEN << "OK" << RESET << std::endl;
+        std::cout << BOLDGREEN << "OK " << RESET << std::endl;
     else
         std::cout << BOLDRED << percent << "%" << RESET << std::endl;
 }

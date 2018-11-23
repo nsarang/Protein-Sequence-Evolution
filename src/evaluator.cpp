@@ -32,11 +32,11 @@ double Evaluator::O_Fitna(Protein &target, ProteinProfile& profiles, DFIRE2& dDF
     score[1] = Secondary_Struct(target, profiles._aSec_Profile);
     score[2] = AlignmentScore(target, profiles._aAlgn_Profile);
     score[3] = dDFIRE_Inst.Calc_CFE(target) / (target.length() * dDFIRE_COEF);
-    score[4] = PotScore(target, profiles._aPot_Bar, profiles._aPot_Stdev, profiles._potS_Param);
+    score[4] = PotScore(target, profiles._aPot_Bar, profiles._aPot_Stdev, profiles._dPotS_Param);
     auto ret = FrequencyScore(target, profiles._aAA_Freq_Mean, profiles._aAA_Freq_Stdev);
     std::copy(ret.begin(), ret.end(), score.begin() + 5);
 
-    for (int i = 0; i < _vecWeights.size(); ++i)
+    for (int i = 0, n = _vecWeights.size(); i < n; ++i) // Avoid gcc comparison warning
         dFinal_Score += _vecWeights[i][2] * eNormalaize(score[i], _vecWeights[i][0], _vecWeights[i][1]);
 
     return dFinal_Score;

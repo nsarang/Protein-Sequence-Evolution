@@ -32,8 +32,8 @@ class ProteinProfile {
 public:
 	ProteinProfile(Protein target);
 	void CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS, bool bVerbose = true,
-	                       bool bSave_Frags = true, int potS_Param = Pot_S_Constant,
-	                       double dFrag_Score_Cutoff = DIST_CUTOFF, double dGap_Score = GAP_SCORE,
+	                       bool bSave_Frags = true, double dPotS_Param = Pot_S_Constant,
+	                       double dFrag_Score_Cutoff = DIST_CUTOFF, double dGap_Penalty = GAP_PENALTY,
 	                       int nMin_Frag = FRAG_MIN_LEN);
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
 	                              double dAlgn_Score_CutOff, double bVerbose);
@@ -57,7 +57,7 @@ private:
 	void Calculate_SS_Profile();
 	void Calculate_Pot_AAFreq_Profile();
 	void Calculate_Alignment_Profile(bool bSave_Frags, double dFrag_Score_Cutoff,
-	                                 double dGap_Score, int nMin_Frag);
+	                                 double dGap_Penalty, int nMin_Frag);
 	void Process_IsHomologue(std::string fPath);
 	void Process_Solvent(Protein& target);
 	void Process_Pot_AAFreq(Protein& target);
@@ -66,8 +66,9 @@ private:
 
 
 	Protein _refProtein; // Target protein
-	double _dAlgn_Score_CutOff, _dFrag_Score_Cutoff, _dGap_Score; // Alignment parameters
-	int _potS_Param, _nMin_Frag;
+	double _dAlgn_Score_CutOff, _dFrag_Score_Cutoff, _dGap_Penalty; // Alignment parameters
+	int _nMin_Frag;
+	double _dPotS_Param;
 	bool bAlgn_Rdy{ false }, bFrags_Rdy{ false }, bSolvent_Rdy{ false }, bSS_Rdy{ false }, bPot_Rdy { false };
 
 	std::vector<Protein> _vecHomologous_Proteins; // Protein with homologous structures extracted from CATH

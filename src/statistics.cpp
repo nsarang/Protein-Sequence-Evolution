@@ -36,7 +36,7 @@ std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double co
 
     auto low = std::lower_bound(vecInp.begin(), vecInp.end(), vecInp[Q1] - coef * IQR);
     auto up = std::upper_bound(vecInp.begin(), vecInp.end(), vecInp[Q3] + coef * IQR);
-    std::cerr << "Passed\n";
+    std::cerr << IQR << " " << coef * IQR << " " << vecInp[Q1] << " " << vecInp[Q3] << "\n" << low -  vecInp.begin() << " " << up - vecInp.begin() << "   Passing\n";
     return std::vector(low, up);
 }
 

@@ -15,7 +15,7 @@
 #include <dirent.h>
 #include <cerrno>
 #include <cstring>
-#include "cpplocate.h"
+#include "cpplocate.hpp"
 #include "mapping.h"
 #include "subprocess.hpp"
 

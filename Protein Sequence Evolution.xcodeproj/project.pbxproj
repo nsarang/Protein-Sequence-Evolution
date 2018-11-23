@@ -7,14 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AC1D6734203B22D300DC2D66 /* cpplocate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC1D6732203B22D300DC2D66 /* cpplocate.cpp */; };
-		AC5C920120A6FC6F000743A6 /* dDFIRE2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC5C91F720A6FC6F000743A6 /* dDFIRE2.cpp */; };
-		AC5C920220A6FC6F000743A6 /* ProtEvol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC5C91F920A6FC6F000743A6 /* ProtEvol.cpp */; };
-		AC5C920320A6FC6F000743A6 /* alignment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC5C91FA20A6FC6F000743A6 /* alignment.cpp */; };
-		AC5C920420A6FC6F000743A6 /* db_process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC5C91FC20A6FC6F000743A6 /* db_process.cpp */; };
-		AC5C920520A6FC6F000743A6 /* mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC5C920020A6FC6F000743A6 /* mapping.cpp */; };
-		AC6A614620A31A1200F07635 /* statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC6A614420A31A1200F07635 /* statistics.cpp */; };
-		AC6A614920A31A2000F07635 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC6A614720A31A2000F07635 /* utility.cpp */; };
+		AC55E3C921A6F7F800DA49B1 /* protein.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3B621A6F7F800DA49B1 /* protein.cpp */; };
+		AC55E3CA21A6F7F800DA49B1 /* protein_profile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3B721A6F7F800DA49B1 /* protein_profile.cpp */; };
+		AC55E3CB21A6F7F800DA49B1 /* driver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3BA21A6F7F800DA49B1 /* driver.cpp */; };
+		AC55E3CC21A6F7F800DA49B1 /* mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3BB21A6F7F800DA49B1 /* mapping.cpp */; };
+		AC55E3CD21A6F7F800DA49B1 /* statistics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3BC21A6F7F800DA49B1 /* statistics.cpp */; settings = {COMPILER_FLAGS = "-std=c++1z"; }; };
+		AC55E3CE21A6F7F800DA49B1 /* evaluator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3BD21A6F7F800DA49B1 /* evaluator.cpp */; settings = {COMPILER_FLAGS = "-std=c++1z"; }; };
+		AC55E3CF21A6F7F800DA49B1 /* utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3BE21A6F7F800DA49B1 /* utility.cpp */; };
+		AC55E3D021A6F7F800DA49B1 /* dDFIRE2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3C121A6F7F800DA49B1 /* dDFIRE2.cpp */; };
+		AC55E3D121A6F7F800DA49B1 /* cpplocate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC55E3C821A6F7F800DA49B1 /* cpplocate.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,22 +32,25 @@
 
 /* Begin PBXFileReference section */
 		AC1D67282039EF2E00DC2D66 /* Protein Sequence Evolution */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Protein Sequence Evolution"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC1D6732203B22D300DC2D66 /* cpplocate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpplocate.cpp; sourceTree = "<group>"; };
-		AC1D6733203B22D300DC2D66 /* cpplocate.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = cpplocate.h; sourceTree = "<group>"; };
-		AC5C91F720A6FC6F000743A6 /* dDFIRE2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = dDFIRE2.cpp; sourceTree = "<group>"; };
-		AC5C91F820A6FC6F000743A6 /* dDFIRE2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dDFIRE2.h; sourceTree = "<group>"; };
-		AC5C91F920A6FC6F000743A6 /* ProtEvol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ProtEvol.cpp; sourceTree = "<group>"; };
-		AC5C91FA20A6FC6F000743A6 /* alignment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = alignment.cpp; sourceTree = "<group>"; };
-		AC5C91FB20A6FC6F000743A6 /* alignment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alignment.h; sourceTree = "<group>"; };
-		AC5C91FC20A6FC6F000743A6 /* db_process.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = db_process.cpp; sourceTree = "<group>"; };
-		AC5C91FD20A6FC6F000743A6 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = constants.h; sourceTree = "<group>"; };
-		AC5C91FE20A6FC6F000743A6 /* db_process.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = db_process.h; sourceTree = "<group>"; };
-		AC5C91FF20A6FC6F000743A6 /* mapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapping.h; sourceTree = "<group>"; };
-		AC5C920020A6FC6F000743A6 /* mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapping.cpp; sourceTree = "<group>"; };
-		AC6A614420A31A1200F07635 /* statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = statistics.cpp; sourceTree = "<group>"; };
-		AC6A614520A31A1200F07635 /* statistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = statistics.h; sourceTree = "<group>"; };
-		AC6A614720A31A2000F07635 /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utility.cpp; sourceTree = "<group>"; };
-		AC6A614820A31A2000F07635 /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utility.h; sourceTree = "<group>"; };
+		AC55E3B621A6F7F800DA49B1 /* protein.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = protein.cpp; path = src/protein.cpp; sourceTree = "<group>"; };
+		AC55E3B721A6F7F800DA49B1 /* protein_profile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = protein_profile.cpp; path = src/protein_profile.cpp; sourceTree = "<group>"; };
+		AC55E3B821A6F7F800DA49B1 /* protein_profile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = protein_profile.h; path = src/protein_profile.h; sourceTree = "<group>"; };
+		AC55E3B921A6F7F800DA49B1 /* protein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = protein.h; path = src/protein.h; sourceTree = "<group>"; };
+		AC55E3BA21A6F7F800DA49B1 /* driver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = driver.cpp; path = src/driver.cpp; sourceTree = "<group>"; };
+		AC55E3BB21A6F7F800DA49B1 /* mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mapping.cpp; path = src/mapping.cpp; sourceTree = "<group>"; };
+		AC55E3BC21A6F7F800DA49B1 /* statistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = statistics.cpp; path = src/statistics.cpp; sourceTree = "<group>"; };
+		AC55E3BD21A6F7F800DA49B1 /* evaluator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = evaluator.cpp; path = src/evaluator.cpp; sourceTree = "<group>"; };
+		AC55E3BE21A6F7F800DA49B1 /* utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utility.cpp; path = src/utility.cpp; sourceTree = "<group>"; };
+		AC55E3BF21A6F7F800DA49B1 /* subprocess.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = subprocess.hpp; path = src/subprocess.hpp; sourceTree = "<group>"; };
+		AC55E3C021A6F7F800DA49B1 /* utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utility.h; path = src/utility.h; sourceTree = "<group>"; };
+		AC55E3C121A6F7F800DA49B1 /* dDFIRE2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dDFIRE2.cpp; path = src/dDFIRE2.cpp; sourceTree = "<group>"; };
+		AC55E3C221A6F7F800DA49B1 /* dDFIRE2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dDFIRE2.h; path = src/dDFIRE2.h; sourceTree = "<group>"; };
+		AC55E3C321A6F7F800DA49B1 /* constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = constants.h; path = src/constants.h; sourceTree = "<group>"; };
+		AC55E3C421A6F7F800DA49B1 /* evaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = evaluator.h; path = src/evaluator.h; sourceTree = "<group>"; };
+		AC55E3C521A6F7F800DA49B1 /* statistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = statistics.h; path = src/statistics.h; sourceTree = "<group>"; };
+		AC55E3C621A6F7F800DA49B1 /* mapping.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mapping.h; path = src/mapping.h; sourceTree = "<group>"; };
+		AC55E3C721A6F7F800DA49B1 /* cpplocate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpplocate.h; path = src/cpplocate.h; sourceTree = "<group>"; };
+		AC55E3C821A6F7F800DA49B1 /* cpplocate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cpplocate.cpp; path = src/cpplocate.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,7 +67,25 @@
 		AC1D671F2039EF2E00DC2D66 = {
 			isa = PBXGroup;
 			children = (
-				AC1D672A2039EF2E00DC2D66 /* Protein Sequence Evolution */,
+				AC55E3B621A6F7F800DA49B1 /* protein.cpp */,
+				AC55E3B721A6F7F800DA49B1 /* protein_profile.cpp */,
+				AC55E3B821A6F7F800DA49B1 /* protein_profile.h */,
+				AC55E3B921A6F7F800DA49B1 /* protein.h */,
+				AC55E3BA21A6F7F800DA49B1 /* driver.cpp */,
+				AC55E3BB21A6F7F800DA49B1 /* mapping.cpp */,
+				AC55E3BC21A6F7F800DA49B1 /* statistics.cpp */,
+				AC55E3BD21A6F7F800DA49B1 /* evaluator.cpp */,
+				AC55E3BE21A6F7F800DA49B1 /* utility.cpp */,
+				AC55E3BF21A6F7F800DA49B1 /* subprocess.hpp */,
+				AC55E3C021A6F7F800DA49B1 /* utility.h */,
+				AC55E3C121A6F7F800DA49B1 /* dDFIRE2.cpp */,
+				AC55E3C221A6F7F800DA49B1 /* dDFIRE2.h */,
+				AC55E3C321A6F7F800DA49B1 /* constants.h */,
+				AC55E3C421A6F7F800DA49B1 /* evaluator.h */,
+				AC55E3C521A6F7F800DA49B1 /* statistics.h */,
+				AC55E3C621A6F7F800DA49B1 /* mapping.h */,
+				AC55E3C721A6F7F800DA49B1 /* cpplocate.h */,
+				AC55E3C821A6F7F800DA49B1 /* cpplocate.cpp */,
 				AC1D67292039EF2E00DC2D66 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,29 +96,6 @@
 				AC1D67282039EF2E00DC2D66 /* Protein Sequence Evolution */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		AC1D672A2039EF2E00DC2D66 /* Protein Sequence Evolution */ = {
-			isa = PBXGroup;
-			children = (
-				AC5C91F720A6FC6F000743A6 /* dDFIRE2.cpp */,
-				AC5C91F820A6FC6F000743A6 /* dDFIRE2.h */,
-				AC5C91F920A6FC6F000743A6 /* ProtEvol.cpp */,
-				AC5C91FA20A6FC6F000743A6 /* alignment.cpp */,
-				AC5C91FB20A6FC6F000743A6 /* alignment.h */,
-				AC5C91FC20A6FC6F000743A6 /* db_process.cpp */,
-				AC5C91FD20A6FC6F000743A6 /* constants.h */,
-				AC5C91FE20A6FC6F000743A6 /* db_process.h */,
-				AC5C91FF20A6FC6F000743A6 /* mapping.h */,
-				AC5C920020A6FC6F000743A6 /* mapping.cpp */,
-				AC6A614720A31A2000F07635 /* utility.cpp */,
-				AC6A614820A31A2000F07635 /* utility.h */,
-				AC6A614420A31A1200F07635 /* statistics.cpp */,
-				AC6A614520A31A1200F07635 /* statistics.h */,
-				AC1D6732203B22D300DC2D66 /* cpplocate.cpp */,
-				AC1D6733203B22D300DC2D66 /* cpplocate.h */,
-			);
-			path = "Protein Sequence Evolution";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,14 +155,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC5C920520A6FC6F000743A6 /* mapping.cpp in Sources */,
-				AC5C920120A6FC6F000743A6 /* dDFIRE2.cpp in Sources */,
-				AC5C920420A6FC6F000743A6 /* db_process.cpp in Sources */,
-				AC5C920320A6FC6F000743A6 /* alignment.cpp in Sources */,
-				AC6A614920A31A2000F07635 /* utility.cpp in Sources */,
-				AC1D6734203B22D300DC2D66 /* cpplocate.cpp in Sources */,
-				AC6A614620A31A1200F07635 /* statistics.cpp in Sources */,
-				AC5C920220A6FC6F000743A6 /* ProtEvol.cpp in Sources */,
+				AC55E3CC21A6F7F800DA49B1 /* mapping.cpp in Sources */,
+				AC55E3C921A6F7F800DA49B1 /* protein.cpp in Sources */,
+				AC55E3CA21A6F7F800DA49B1 /* protein_profile.cpp in Sources */,
+				AC55E3CF21A6F7F800DA49B1 /* utility.cpp in Sources */,
+				AC55E3D021A6F7F800DA49B1 /* dDFIRE2.cpp in Sources */,
+				AC55E3D121A6F7F800DA49B1 /* cpplocate.cpp in Sources */,
+				AC55E3CB21A6F7F800DA49B1 /* driver.cpp in Sources */,
+				AC55E3CD21A6F7F800DA49B1 /* statistics.cpp in Sources */,
+				AC55E3CE21A6F7F800DA49B1 /* evaluator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,15 +262,17 @@
 		AC1D67302039EF2E00DC2D66 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_ENUM_CONVERSION = NO;
 				CLANG_WARN_INT_CONVERSION = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				OTHER_CPLUSPLUSFLAGS = "-std=c++1z";
 				OTHER_LDFLAGS = (
 					"-I/usr/local/include",
 					"-L/usr/local/lib",
 					"-lgsl",
 					"-lgslcblas",
-					"-lm",
 				);
 				OTHER_LIBTOOLFLAGS = "-lm -lgsl -lgslcblas -L";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -280,15 +282,17 @@
 		AC1D67312039EF2E00DC2D66 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_WARN_ENUM_CONVERSION = NO;
 				CLANG_WARN_INT_CONVERSION = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				OTHER_CPLUSPLUSFLAGS = "-std=c++1z";
 				OTHER_LDFLAGS = (
 					"-I/usr/local/include",
 					"-L/usr/local/lib",
 					"-lgsl",
 					"-lgslcblas",
-					"-lm",
 				);
 				OTHER_LIBTOOLFLAGS = "-lm -lgsl -lgslcblas -L";
 				PRODUCT_NAME = "$(TARGET_NAME)";

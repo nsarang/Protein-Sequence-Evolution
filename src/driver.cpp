@@ -26,7 +26,7 @@
 int main(int argc, const char * argv[]) {
     std::srand(std::time(NULL));
 
-    assert(argc > 0);
+    assert(argc > 1);
     std::string target_path = argv[1];
 
     auto target = Protein(target_path, true, true, true);

@@ -1,6 +1,6 @@
-FC=gfortran-7
+FC=gfortran-8
 FFLAGS= -O3 -ffast-math -lm
-CC=g++-7
+CC=g++-8
 CFLAGS=-static
 
 JC=javac
