@@ -1,5 +1,5 @@
-#ifndef __CPP_LOCATE_CPP__
-#define __CPP_LOCATE_CPP__
+#ifndef __CPPLOCATE_HPP__
+#define __CPPLOCATE_HPP__
 
 
 #if defined(_WIN32)
@@ -21,14 +21,13 @@
 #include <iostream>
 
 
-namespace clocate
+class clocate
 {
 
 
-std::string GetExecutablePath()
+static std::string GetExecutablePath()
 {
 #if defined(_WIN32)
-
     std::array<char, MAX_PATH> exePath;
 
     if (GetModuleFileNameA(GetModuleHandleA(nullptr), exePath.data(), exePath.size()) == 0)
@@ -40,7 +39,6 @@ std::string GetExecutablePath()
 
 
 #elif defined(__linux__)
-
     std::array<char, PATH_MAX> exePath;
 
     auto len = ::readlink("/proc/self/exe", exePath.data(), exePath.size());
@@ -54,7 +52,6 @@ std::string GetExecutablePath()
 
 
 #elif defined(__APPLE__)
-
     std::array<char, PATH_MAX> exePath;
 
     auto len = std::uint32_t(exePath.size());
@@ -76,14 +73,13 @@ std::string GetExecutablePath()
 
 
 #else
-
     return "";
 
 #endif
 }
 
 
-std::string GetDirectoryPath(const std::string & fullpath)
+static std::string GetDirectoryPath(const std::string & fullpath)
 {
     if (fullpath.empty())
     {
@@ -102,10 +98,9 @@ std::string GetDirectoryPath(const std::string & fullpath)
 }
 
 
-std::string GetCurrentWorkingDirectory()
+static std::string GetCurrentWorkingDirectory()
 {
 #if defined(__linux__) || defined(__APPLE__)
-
     std::array<char, PATH_MAX> cwdPath;
 
     if (getcwd(cwdPath.data(), PATH_MAX) != NULL)
@@ -117,7 +112,6 @@ std::string GetCurrentWorkingDirectory()
 
 
 #elif defined(_WIN32)
-
     std::array<wchar_t, PATH_MAX> cwdPath;
     if (GetCurrentDirectoryW(MAX_PATH, cwdPath.data()) != 0)
     {
@@ -128,33 +122,29 @@ std::string GetCurrentWorkingDirectory()
 
 
 #else
-
     return "";
 
 #endif
 }
 
 
-bool SetCurrentWorkingDirectory(std::string path)
+static bool SetCurrentWorkingDirectory(std::string path)
 {
 #if defined(__linux__) || defined(__APPLE__)
-
     return chdir(path.c_str()) == 0;
 
 
 #elif defined(_WIN32)
-
     return SetCurrentDirectory(path.c_str()) != 0;
 
 #else
-
     return false;
 
 #endif
 }
 
 
-} // namespace
+}; // clocate
 
 
-#endif // __CPP_LOCATE_CPP__
+#endif // __CPPLOCATE_HPP__
