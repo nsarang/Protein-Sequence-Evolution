@@ -37,25 +37,33 @@ class Protein {
 	friend class Evaluator;
 
 public:
-	Protein(std::string fPath, bool bDist = false, bool bSolv = false, bool bSec = false);
+	Protein(std::string fPath, int nFlag = 0, double dPotS_Param = Pot_S_Constant);
 	static void Parse_PDB(std::string fPath, std::vector<AminoAcid>& retVec);
 	double CA_Atom_Distance(int i, int j);
+	std::string Get_Sequence();
 	int length();
 	char operator[](int i);
 
-	void Calculate_Distances();
-	void Calculate_Solvent();
-	void Calculate_SS();
+	void Calculate_Distances(bool bForceCalc = false);
+	void Calculate_Solvent(bool bForceCalc = false);
+	void Calculate_SS(bool bForceCalc = false);
+	void Calculate_Pot(double dPotS_Param, bool bForceCalc = false);
 
 //private:
+	double dist(std::tuple<double, double, double>&, std::tuple<double, double, double> &t);
+	bool IsStandardAA(std::string abrv);
+	bool IsStandardAA(char symbol);
+
 	std::string sequence,
 	    fPath,
 	    md5;
 
-	bool bDist_Rdy{ false }, bSolv_Rdy{ false }, bSS_Rdy{ false };
+	bool bDist_Rdy{ false }, bSolv_Rdy{ false }, bSS_Rdy{ false }, bPot_Rdy{ false };
+
 	std::vector<AminoAcid> vecAmino_Acid;
 	std::vector<std::vector<double > > vecAtom_Distance;
 	std::vector<int> aSolvent_Accessibility, aSecondary_Structure;
+	std::array<double, 20> aPot_Values{ }, aAA_Freqs{ }; 
 };
 
 

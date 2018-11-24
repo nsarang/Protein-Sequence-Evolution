@@ -45,10 +45,6 @@ struct AminoAcid {
 // FUNCTIONS
 std::vector<std::string> CATH_ListFiles(std::string path);
 
-double dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2);
-
-bool IsStandardAA(std::string abrv);
-
 void Progress_Indicator(std::string text, long long current, long long total);
 
 int system_call_err(std::string command, std::string& stdout);

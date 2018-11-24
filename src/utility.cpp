@@ -21,21 +21,9 @@ std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
 }
 
 
-double dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2) {
-    double dx = std::get<0>(t1) - std::get<0>(t2),
-           dy = std::get<1>(t1) - std::get<1>(t2),
-           dz = std::get<2>(t1) - std::get<2>(t2);
-    return std::sqrt(dx * dx + dy * dy + dz * dz);
-}
-
-
-bool IsStandardAA(std::string abrv)
-{
-    return !(abrv == "ASX" || abrv == "GLX" || abrv == "SEC" || abrv == "PYL" || abrv == "UNK");
-}
-
-
 void Progress_Indicator(std::string text, long long current, long long total) {
+    if (current == 0)
+        std::cout << "|\n";
     std::cout << "\r\033[F" << text << ": ";
     int percent = current * 100 / total;
     if (percent == 100)

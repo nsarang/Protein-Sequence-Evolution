@@ -2,19 +2,21 @@
 
 
 
-Protein::Protein(std::string fPath, bool bDist, bool bSolv, bool bSec)
+Protein::Protein(std::string fPath, int nFlag, double dPotS_Param)
     : fPath( fPath ), md5( File_md5(fPath) )
 {
     Parse_PDB(fPath, vecAmino_Acid);
     for (auto& amino_acid : vecAmino_Acid)
         sequence += amino_acid.symbol;
 
-    if (bDist)
+    if (nFlag & 1)
         Calculate_Distances();
-    if (bSolv)
+    if (nFlag & 2)
         Calculate_Solvent();
-    if (bSec)
+    if (nFlag & 4)
         Calculate_SS();
+    if (nFlag & 8)
+        Calculate_Pot(dPotS_Param);
 }
 
 
@@ -44,6 +46,11 @@ void Protein::Parse_PDB(std::string fPath, std::vector<AminoAcid> &retVec) {
 }
 
 
+std::string Protein::Get_Sequence() {
+    return sequence;
+}
+
+
 int Protein::length() {
     return sequence.length();
 }
@@ -61,7 +68,10 @@ char Protein::operator[](int i) {
 }
 
 
-void Protein::Calculate_Distances() {
+void Protein::Calculate_Distances(bool bForceCalc) {
+    if (bDist_Rdy && !bForceCalc)
+        return;
+
     vecAtom_Distance.resize( length(), std::vector<double>(length()) );
 
     for (int i = 0; i < length(); ++i) {
@@ -75,7 +85,9 @@ void Protein::Calculate_Distances() {
 }
 
 
-void Protein::Calculate_Solvent() {
+void Protein::Calculate_Solvent(bool bForceCalc) {
+    if (bSolv_Rdy && !bForceCalc)
+        return;
     if (bDist_Rdy == false)
         Calculate_Distances();
 
@@ -100,7 +112,9 @@ void Protein::Calculate_Solvent() {
 }
 
 
-void Protein::Calculate_SS() {
+void Protein::Calculate_SS(bool bForceCalc) {
+    if (bSS_Rdy && !bForceCalc)
+        return;
     aSecondary_Structure.resize( length() );
     std::string stdout, line, prev_line;
 
@@ -112,7 +126,7 @@ void Protein::Calculate_SS() {
         if (line.substr(0, 3) == "STR") {
             for (int i = 10; i < 60; ++i) {
                 assert(isalpha(line[i]) || isspace(line[i]));
-                
+
                 if (isspace(prev_line[i]) || prev_line[i] == 'X')
                     continue;
                 if (isspace(line[i]))
@@ -132,3 +146,64 @@ void Protein::Calculate_SS() {
     bSS_Rdy = true;
 }
 
+
+void Protein::Calculate_Pot(double dPotS_Param, bool bForceCalc) {
+    if (bPot_Rdy && !bForceCalc)
+        return;
+
+    std::array<double, 20> AA_freq{0}, pot_r, pot0, pot1{}, var0;
+    int n = length();
+
+    for (auto c : sequence)
+        if (IsStandardAA(c))
+            AA_freq[ sym_to_idx[c] ]++;
+
+
+    for (int i = 0; i < 20; ++i) {
+        if (AA_freq[i] < 2)
+            continue;
+        pot_r[i] = std::exp(-std::sqrt(AA_freq[i]) / (n * dPotS_Param));
+        pot0[i] = (AA_freq[i] * (AA_freq[i] - 1) * pot_r[i] * (n - 1 / (1 - pot_r[i])))
+                  / (n * (n - 1) * (1 - pot_r[i]));
+        var0[i] = std::sqrt(std::pow(pot_r[i] * AA_freq[i] * (1 - AA_freq[i] / n), 2)
+                            / ((1 - pot_r[i] * pot_r[i]) * n));
+    }
+
+    for (int i = 0; i < n; ++i)
+        for (int j = i + 1; j < n; ++j) {
+            if (!IsStandardAA(sequence[i]))
+                continue;
+            int idx = sym_to_idx[ sequence[i] ];
+            pot1[idx] += (sequence[i] == sequence[j]) * std::pow(pot_r[idx], j - i);
+        }
+
+    for (int i = 0; i < 20; ++i) {
+ //       std::cerr << i << "\t" << n << " " << aAA_Freqs[i] << "\n";
+        if (AA_freq[i] < 2)
+            continue;
+
+        aPot_Values[i] = (pot1[i] - pot0[i]) / var0[i];
+        aAA_Freqs[i] = AA_freq[i] / n;
+      //  std::cerr << i << "\t" << AA_freq[i] << " " << n << " " << aAA_Freqs[i] << "\n";
+    }
+
+    bPot_Rdy = true;
+}
+
+
+double Protein::dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2) {
+    double dx = std::get<0>(t1) - std::get<0>(t2),
+           dy = std::get<1>(t1) - std::get<1>(t2),
+           dz = std::get<2>(t1) - std::get<2>(t2);
+    return std::sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+
+bool Protein::IsStandardAA(std::string abrv) {
+    return !(abrv == "ASX" || abrv == "GLX" || abrv == "SEC" || abrv == "PYL" || abrv == "UNK");
+}
+
+
+bool Protein::IsStandardAA(char symbol) {
+    return !(symbol == 'B' || symbol == 'Z' || symbol == 'U' || symbol == 'O' || symbol == 'X');
+}

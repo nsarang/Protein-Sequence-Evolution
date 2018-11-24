@@ -46,45 +46,21 @@ double Evaluator::O_Fitna(Protein &target, ProteinProfile& profiles, DFIRE2& dDF
 double Evaluator::PotScore(Protein& target,
                            std::array<double, 20>& aPot_Bar,
                            std::array<double, 20>& aPot_Stdev,
-                           int dS_Parameter)
+                           double dPotS_Param)
 {
-    std::array<double, 20> AA_freq{}, pot_r, pot0, pot1{}, var0;
-    int n = target.length();
-
-    for (int i = 0; i < n; ++i) {
-        if (sym_to_idx.count(target[i]) == 0)
-            continue;
-        AA_freq[ sym_to_idx[target[i]] ]++;
-    }
-
-    for (int i = 0; i < 20; ++i) {
-        if (AA_freq[i] < 2)
-            continue;
-        pot_r[i] = std::exp(-std::sqrt(AA_freq[i]) / (n * dS_Parameter));
-        pot0[i] = (AA_freq[i] * (AA_freq[i] - 1) * pot_r[i] * (n - 1 / (1 - pot_r[i])))
-                  / (n * (n - 1) * (1 - pot_r[i]));
-        var0[i] = std::sqrt(std::pow(pot_r[i] * AA_freq[i] * (1 - AA_freq[i] / n), 2)
-                            / ((1 - pot_r[i] * pot_r[i]) * n));
-    }
-
-    for (int i = 0; i < n; ++i) {
-        if (sym_to_idx.count(target[i]) == 0)
-            continue;
-        int idx = sym_to_idx[target[i]];
-        for (int j = i + 1; j < n; ++j)
-            pot1[idx] += (target[i] == target[j]) * std::pow(pot_r[idx], j - i);
-    }
+    target.Calculate_Pot(dPotS_Param);
 
     double avg = 0;
-    int excluded = 0;
+    int n = target.length(),
+        excluded = 0;
     for (int i = 0; i < 20; ++i) {
-        if (AA_freq[i] < 2) {
-            excluded += AA_freq[i];
+        int nFreq = target.aAA_Freqs[i] * n;
+        if (nFreq < 2) {
+            excluded += nFreq;
             continue;
         }
-        double potScore_i = (pot1[i] - pot0[i]) / var0[i];
-        avg += AA_freq[i] * ( 0.5 * std::pow((potScore_i - aPot_Bar[i]) / aPot_Stdev[i], 2)
-                              - log(1 / (aPot_Stdev[i] * std::sqrt(2 * M_PI))) );
+        avg += nFreq * ( 0.5 * std::pow((target.aPot_Values[i] - aPot_Bar[i]) / aPot_Stdev[i], 2)
+                         - log(1 / (aPot_Stdev[i] * std::sqrt(2 * M_PI))) );
     }
     return avg / (n - excluded);
 }
@@ -92,11 +68,13 @@ double Evaluator::PotScore(Protein& target,
 
 double Evaluator::Solvent_Score(Protein& target,
                                 std::array<std::array<double, 7>, 20>& aProfile) {
+    target.Calculate_Solvent();
+
     double score = 0;
     int n = target.length(),
         excluded = 0;
     for (int i = 0; i < n; ++i) {
-        if (sym_to_idx.count(target[i]) == 0) {
+        if (!target.IsStandardAA(target[i])) {
             excluded++;
             continue;
         }
@@ -109,11 +87,13 @@ double Evaluator::Solvent_Score(Protein& target,
 
 double Evaluator::Secondary_Struct(Protein& target,
                                    std::array<std::array<double, 7>, 20>& aProfile) {
+    target.Calculate_SS();
+
     double score = 0;
     int n = target.length(),
         excluded = 0;
     for (int i = 0; i < n; ++i) {
-        if (sym_to_idx.count(target[i]) == 0) {
+        if (!target.IsStandardAA(target[i])) {
             excluded++;
             continue;
         }
@@ -130,7 +110,7 @@ double Evaluator::AlignmentScore(Protein& target,
     int n = target.length(),
         excluded = 0;
     for (int i = 0; i < n; ++i) {
-        if (sym_to_idx.count(target[i]) == 0) {
+        if (!target.IsStandardAA(target[i])) {
             excluded++;
             continue;
         }
@@ -145,18 +125,12 @@ std::array<double, 20> Evaluator::FrequencyScore(Protein& target,
         std::array<double, 20>& aAA_Freq_Mean,
         std::array<double, 20>& aAA_Freq_Stdev)
 {
-    std::array<double, 20> aAA_freq{}, aAA_score{};
-    auto& target_sequence = target.sequence;
+    std::array<double, 20> retAA_scores{};
 
-    for (auto c : target_sequence)
-        if (sym_to_idx.count(c) != 0)
-            aAA_freq[sym_to_idx[c]]++;
+    for (int i = 0; i < 20; ++i)
+        retAA_scores[i] = std::abs((target.aAA_Freqs[i] - aAA_Freq_Mean[i]) / aAA_Freq_Stdev[i]);
 
-    for (int i = 0; i < 20; ++i) {
-        aAA_freq[i] /= target_sequence.length();
-        aAA_score[i] = std::abs((aAA_freq[i] - aAA_Freq_Mean[i]) / aAA_Freq_Stdev[i]);
-    }
-    return aAA_score;
+    return retAA_scores;
 }
 
 

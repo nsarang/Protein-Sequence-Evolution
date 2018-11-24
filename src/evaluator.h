@@ -21,7 +21,7 @@ public:
 	double PotScore(Protein& target,
 	                std::array<double, 20>& aPot_Bar,
 	                std::array<double, 20>& aPot_Stdev,
-	                int dS_Parameter);
+	                double dPotS_Param);
 
 	double Solvent_Score(Protein& target,
 	                     std::array<std::array<double, 7>, 20>& aProfile);

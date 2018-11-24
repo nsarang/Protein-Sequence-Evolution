@@ -29,15 +29,16 @@ int main(int argc, const char * argv[]) {
     assert(argc > 1);
     std::string target_path = argv[1];
 
-    auto target = Protein(target_path, true, true, true);
-    for (int i = 0; i < target.length(); ++i) {
-        std::cerr <<target.aSolvent_Accessibility[i] << " \n"[i == target.length()-1]; 
-    }
-        for (int i = 0; i < target.length(); ++i) {
-        std::cerr << target.aSecondary_Structure[i] << " \n"[i == target.length()-1]; 
-    }
+    auto target = Protein(target_path, 1 + 2 + 4 + 8);
+ //  for (int i = 0; i < 20; ++i) {
+ //      std::cerr <<target.aAA_Freqs[i] << " \n"[i == target.length()-1]; 
+ //  }
+  // return 0;
+//        for (int i = 0; i < target.length(); ++i) {
+//        std::cerr << target.aSecondary_Structure[i] << " \n"[i == target.length()-1]; 
+//    }
+    std::cerr << target.Get_Sequence() << "\n";
 
-    std::cerr << "passed\n";
     auto profile = ProteinProfile(target);
 
     std::vector<Protein> pt;

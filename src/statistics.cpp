@@ -1,45 +1,32 @@
 #include "statistics.h"
 
 
-std::tuple<double, double> Mean_SD(std::vector<double> &vec) {
+std::tuple<double, double> Mean_SD(std::vector<double> &vecInp) {
+    assert(vecInp.size() > 1);
     double ret_mean, ret_stdev;
-    /*
-    double sum = 0, sq_sum = 0;
-    int n = vec.size();
 
-    for (auto &e : vec) {
-        sum += e;
-        sq_sum += e * e;
-    }
-    ret_mean = sum / n;
-    double var = sq_sum / n - ret_mean * ret_mean;
-    var = (var < M_EPS ? 0 : var);
-    ret_stdev = std::sqrt(var);
-    */
-
-    ret_mean = gsl_stats_mean(vec.data(), 1, vec.size());
-    ret_stdev = gsl_stats_sd_m(vec.data(), 1, vec.size(), ret_mean);
+    ret_mean = gsl_stats_mean(vecInp.data(), 1, vecInp.size());
+    ret_stdev = gsl_stats_sd_m(vecInp.data(), 1, vecInp.size(), ret_mean);
     return std::tuple(ret_mean, ret_stdev);
 }
 
-#include <iostream>
-#include <cassert>
+
 std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double coef) {
     assert(vecInp.size());
+    
     int Q1, Q2, Q3;
     Q1 = vecInp.size() / 4;
     Q2 = vecInp.size() / 2;
     Q3 = Q1 + Q2;
-    std::cerr << "IQR " << Q1 << " " << Q2 << " " << Q3 << "\n";
+
     std::sort(vecInp.begin(), vecInp.end());
     double IQR = vecInp[Q3] - vecInp[Q1];
 
     auto low = std::lower_bound(vecInp.begin(), vecInp.end(), vecInp[Q1] - coef * IQR);
     auto up = std::upper_bound(vecInp.begin(), vecInp.end(), vecInp[Q3] + coef * IQR);
-    std::cerr << IQR << " " << coef * IQR << " " << vecInp[Q1] << " " << vecInp[Q3] << "\n" << low -  vecInp.begin() << " " << up - vecInp.begin() << "   Passing\n";
+
     return std::vector(low, up);
 }
-
 
 
 int gsl_polynomialfit_robust(size_t n, size_t deg,

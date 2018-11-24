@@ -3,15 +3,14 @@
 
 #include <gsl/gsl_multifit.h>
 #include <gsl/gsl_statistics_double.h>
-#include <cmath>
 #include <vector>
-#include <algorithm>
 #include <tuple>
-#include "constants.h"
+#include <cassert>
+#include <algorithm>
 
 
 
-std::tuple<double, double> Mean_SD(std::vector<double> &vec);
+std::tuple<double, double> Mean_SD(std::vector<double> &vecInp);
 
 std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double coef = 1.5);
 
