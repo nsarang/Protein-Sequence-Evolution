@@ -8,6 +8,7 @@ ProteinProfile::ProteinProfile(Protein target)
     _aAlgn_Profile.resize(_refProtein.length());
     _aAlgn_Position_Count.resize(_refProtein.length());
     _matFragments.resize(_refProtein.length(), std::vector<std::vector<std::string> >( _refProtein.length() ));
+
     for (int i = 0; i < _refProtein.length(); ++i)
         for (int j = 0; j < 7; ++j)
             assert(_aAlgn_Profile[i][j] == 0);
@@ -296,8 +297,6 @@ void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, double dFrag_
 
 
 void ProteinProfile::Calculate_Solvent_Profile() {
-//    std::cerr << __PRETTY_FUNCTION__ << "\n";
-
     std::array<long long, 7> solvent_class_total{};
 
     long long nAA_Total = std::accumulate(_aAA_Total_Count.begin(), _aAA_Total_Count.end(), 0);
@@ -317,8 +316,6 @@ void ProteinProfile::Calculate_Solvent_Profile() {
 
 
 void ProteinProfile::Calculate_SS_Profile() {
-//    std::cerr << __PRETTY_FUNCTION__ << "\n";
-
     std::array<long long, 7> sec_class_total{};
 
     long long nAA_Total = std::accumulate(_aAA_Total_Count.begin(), _aAA_Total_Count.end(), 0);
@@ -339,11 +336,9 @@ void ProteinProfile::Calculate_SS_Profile() {
 
 
 void ProteinProfile::Calculate_Pot_AAFreq_Profile() {
-//   std::cerr << __PRETTY_FUNCTION__ << "\n";
-
     for (int i = 0; i < 20; ++i) {
         if (i == 12)
-         std::cerr << "M :  \n";
+            std::cerr << "M :  \n";
         if (_vecPotScores[i].size() >= 2) {
             if (i == 12) {
                 for (auto i : _vecPotScores[i])
@@ -353,8 +348,8 @@ void ProteinProfile::Calculate_Pot_AAFreq_Profile() {
             _vecPotScores[i] = OutlierElimination_IQR(_vecPotScores[i]);
             std::tie(_aPot_Bar[i], _aPot_Stdev[i]) = Mean_SD(_vecPotScores[i]);
         }
- if (i == 12)
-             std::cerr << "AAM :  \n";
+        if (i == 12)
+            std::cerr << "AAM :  \n";
         if (_vecAA_Freqs[i].size() >= 2) {
             if (i == 12) {
                 for (auto i : _vecAA_Freqs[i])
@@ -369,11 +364,10 @@ void ProteinProfile::Calculate_Pot_AAFreq_Profile() {
 }
 
 
-void ProteinProfile::Write_ToFile(bool bWriteCounts) {
-//   std::cerr << __PRETTY_FUNCTION__ << "\n";
+void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
 
     if (bSolvent_Rdy) {
-        std::ofstream outFile(db_Profiles + RelativeFileName("solvent"));
+        std::ofstream outFile(sDirectory + RelativeFileName("solvent"));
 
         outFile << QuickInfo() << "\n\n" << "#SOLVENT_PROFILE\n\n"
                 << sFileStartSym << "\n";
@@ -385,9 +379,9 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts) {
             outFile << "\n";
         }
     }
-//    std::cerr << "CHECK1\n" << "\n";
+    std::cerr << "CHECK1\n" << "\n";
     if (bSS_Rdy) {
-        std::ofstream outFile(db_Profiles + RelativeFileName("sec"));
+        std::ofstream outFile(sDirectory + RelativeFileName("sec"));
 
         outFile << QuickInfo() << "\n\n" << "#SECONDARY_STRUCTURE_PROFILE\n\n"
                 << sFileStartSym << "\n";
@@ -399,10 +393,10 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts) {
             outFile << "\n";
         }
     }
-//   std::cerr << "CHECK2\n" << "\n";
+    std::cerr << "CHECK2\n" << "\n";
 
     if (bPot_Rdy) {
-        std::ofstream outFile(db_Profiles + RelativeFileName("pot"));
+        std::ofstream outFile(sDirectory + RelativeFileName("pot"));
 
         outFile << QuickInfo() << "\n\n" << "#POT_STATISTIC\n\n" << sFileStartSym << "\n";
 
@@ -417,10 +411,10 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts) {
                     << _aAA_Freq_Mean[i] << " " << _aAA_Freq_Stdev[i] << "\n";
 
     }
-//   std::cerr << "CHECK3\n" << "\n";
+    std::cerr << "CHECK3\n" << "\n";
 
     if (bAlgn_Rdy) {
-        std::ofstream outFile(db_Profiles + RelativeFileName("alignment"));
+        std::ofstream outFile(sDirectory + RelativeFileName("alignment"));
         outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_PROFILE\n\n" << sFileStartSym << "\n";
 
         for (int i = 0; i < _refProtein.length(); ++i) {
@@ -429,23 +423,22 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts) {
                 outFile << " " << std::fixed << std::setprecision(10) << _aAlgn_Profile[i][j];
             outFile << "\n";
         }
-//       std::cerr << "CHECK4\n" << "\n";
+        std::cerr << "CHECK4\n" << "\n";
 
         if (bFrags_Rdy) {
-            std::ofstream outFile(db_Profiles + RelativeFileName("fragment"));
+            std::ofstream outFile(sDirectory + RelativeFileName("fragment"));
             outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_FRAGMENTS\n\n" << sFileStartSym << "\n";
-
             for (int i = 0; i < _refProtein.length(); ++i)
-                for (int j = i + _nMin_Frag - 1; j < _refProtein.length(); ++j)
+                for (int j = i; j < _refProtein.length(); ++j)
                     for (auto& sFragment : _matFragments[i][j])
                         outFile << i << " " << j << " " << sFragment << "\n";
-
         }
 
     }
+    std::cerr << "CHECK5\n" << "\n";
 
     if (bWriteCounts) {
-        std::ofstream outFile(db_Profiles + RelativeFileName("count"));
+        std::ofstream outFile(sDirectory + RelativeFileName("count"));
         outFile << "#BURIAL_COUNT\n\n";
         for (int i = 0; i < 20; ++i) {
             outFile << idx_to_sym[i];
@@ -471,10 +464,11 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts) {
 }
 
 
-void ProteinProfile::Read_FromFile(std::string sParentDirectory) {
+void ProteinProfile::Read_FromFile(std::string sDirectory) {
     std::string HEAD;
+    double PARAM;
 
-    std::string fSolvName = sParentDirectory + RelativeFileName("solvent");
+    std::string fSolvName = sDirectory + RelativeFileName("solvent");
     if (FileExists(fSolvName)) {
         std::ifstream inFile(fSolvName);
 
@@ -490,10 +484,11 @@ void ProteinProfile::Read_FromFile(std::string sParentDirectory) {
         bSolvent_Rdy = true;
     }
 
-    std::string fSecName = sParentDirectory + RelativeFileName("sec");
+    std::string fSecName = sDirectory + RelativeFileName("sec");
     if (FileExists(fSolvName)) {
         std::ifstream inFile(fSecName);
 
+        HEAD = "";
         while (HEAD != sFileStartSym)
             inFile >> HEAD;
 
@@ -506,12 +501,19 @@ void ProteinProfile::Read_FromFile(std::string sParentDirectory) {
         bSS_Rdy = true;
     }
 
-    std::string fPotName = sParentDirectory + RelativeFileName("pot");
+    std::string fPotName = sDirectory + RelativeFileName("pot");
     if (FileExists(fPotName)) {
         std::ifstream inFile(fPotName);
 
-        while (HEAD != sFileStartSym)
+        HEAD = "";
+        while (HEAD != sFileStartSym) {
+            if (HEAD.find("POT_S_PARAMETER") == 0) {
+                inFile >> PARAM;
+                _dPotS_Param = PARAM;
+            }
             inFile >> HEAD;
+        }
+
         for (int i = 0; i < 20; ++i)
             inFile >> HEAD >> _aPot_Bar[i] >> _aPot_Stdev[i];
 
@@ -524,12 +526,29 @@ void ProteinProfile::Read_FromFile(std::string sParentDirectory) {
         bPot_Rdy = true;
     }
 
-    std::string fAlgnName = sParentDirectory + RelativeFileName("alignment");
+    std::string fAlgnName = sDirectory + RelativeFileName("alignment");
     if (FileExists(fAlgnName)) {
         std::ifstream inFile(fAlgnName);
 
-        while (HEAD != sFileStartSym)
+        while (HEAD != sFileStartSym) {
+            if (HEAD.find("ALGN_SCORE_CUTOFF") == 0) {
+                inFile >> PARAM;
+                _dAlgn_Score_CutOff = PARAM;
+            }
+            if (HEAD.find("FRAG_DIST_CUTOFF") == 0) {
+                inFile >> PARAM;
+                _dFrag_Score_Cutoff = PARAM;
+            }
+            if (HEAD.find("GAP_PENALTY") == 0) {
+                inFile >> PARAM;
+                _dGap_Penalty = PARAM;
+            }
+            if (HEAD.find("MIN_FRAG_LENGTH") == 0) {
+                inFile >> PARAM;
+                _nMin_Frag = PARAM;
+            }
             inFile >> HEAD;
+        }
 
         for (int i = 0; i < _refProtein.length(); ++i) {
             inFile >> HEAD;
@@ -539,7 +558,7 @@ void ProteinProfile::Read_FromFile(std::string sParentDirectory) {
 
         bAlgn_Rdy = true;
 
-        std::string fFragName = sParentDirectory + RelativeFileName("fragment");
+        std::string fFragName = sDirectory + RelativeFileName("fragment");
         if (FileExists(fFragName)) {
             std::ifstream inFile(fFragName);
 

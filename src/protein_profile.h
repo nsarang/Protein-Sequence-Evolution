@@ -37,8 +37,8 @@ public:
 	                       int nMin_Frag = FRAG_MIN_LEN);
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
 	                              double dAlgn_Score_CutOff, double bVerbose);
-	void Read_FromFile(std::string sParentDirectory = db_Profiles);
-	void Write_ToFile(bool bWriteCounts = false);
+	void Read_FromFile(std::string sDirectory = db_Profiles);
+	void Write_ToFile(std::string sDirectory = db_Profiles, bool bWriteCounts = false);
 	std::string QuickInfo(bool bIncludeAlignment = false);
 
 
