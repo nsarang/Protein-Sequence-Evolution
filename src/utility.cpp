@@ -1,5 +1,6 @@
 #include "utility.h"
 
+namespace sp = subprocess;
 
 
 std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
@@ -7,7 +8,7 @@ std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
     DIR *hDir;
     dirent *hFile;
     assert(hDir = opendir(sDB_Path.c_str()));
-    int total = stoi(system_call("ls " + sDB_Path + " | wc -l"));
+    int total = CountFilesInDir(sDB_Path);
 
     vecProcessedDB.reserve(total);
     while ((hFile = readdir(hDir))) {
@@ -33,6 +34,7 @@ void Progress_Indicator(std::string text, long long current, long long total) {
 }
 
 
+/*
 int system_call_err(std::string command, std::string& stdout) {
     std::array<char, BUFFERSIZE> buffer;
 
@@ -52,26 +54,8 @@ int system_call_err(std::string command, std::string& stdout) {
     pclose(pipe);
     return WEXITSTATUS(wstat);
 }
+*/
 
-
-std::string system_call(std::string command) {
-    std::array<char, BUFFERSIZE> buffer;
-    std::string result = "";
-
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-        throw std::runtime_error(std::string() + "popen() failed!:\t" + strerror(errno) + "\ncommand: " + command);
-    }
-    try {
-        while (!feof(pipe))
-            if (fgets(buffer.data(), BUFFERSIZE, pipe) != NULL)
-                result += buffer.data();
-    } catch (...) {
-        pclose(pipe);
-        throw;
-    }
-    return result;
-}
 
 
 inline void ltrim(std::string &s) {
@@ -90,6 +74,27 @@ std::string trim(std::string s) {
     ltrim(s);
     rtrim(s);
     return s;
+}
+
+
+/******************************************************************************
+ * Checks to see if a directory exists. Note: This method only checks the
+ * existence of the full path AND if path leaf is a dir.
+ *
+ * @return  >0 if dir exists AND is a dir,
+ *           0 if dir does not exist OR exists but not a dir,
+ *          <0 if an error occurred like dir isn't accessible (errno is also set)
+ *****************************************************************************/
+int DirectoryExists(std::string fDir) {
+    struct stat info;
+
+    int statRC = stat( fDir.c_str(), &info );
+    if ( statRC != 0 ) {
+        if (errno == ENOENT)  { return 0; } // something along the path does not exist
+        if (errno == ENOTDIR) { return 0; } // something in path prefix is not a dir
+        return -1;
+    }
+    return ( info.st_mode & S_IFDIR ) ? 1 : 0;
 }
 
 
@@ -122,11 +127,21 @@ std::string FileBasename(std::string filename) {
 
 std::string File_md5(std::string fName) {
 #if defined(__linux__)
-    std::string ret = subprocess::check_output({"md5sum", fName.c_str()}).buf.data();
+    std::string ret = sp::check_output({"md5sum", fName.c_str()}).buf.data();
 #else
-    std::string ret = subprocess::check_output({"md5", "-r", fName.c_str()}).buf.data();
+    std::string ret = sp::check_output({"md5", "-r", fName.c_str()}).buf.data();
 #endif
     return ret.substr(0, ret.find(' '));
+}
+
+
+int CountFilesInDir(std::string fDir) {
+    auto ls = sp::Popen({"ls", fDir.c_str()}, sp::output{sp::PIPE});
+    auto wc = sp::Popen({"wc", "-l"},
+                                sp::input{ls.output()},
+                                sp::output{sp::PIPE});
+    auto res = wc.communicate().first;
+    return std::stoi(res.buf.data());
 }
 
 

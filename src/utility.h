@@ -15,6 +15,8 @@
 #include <dirent.h>
 #include <cerrno>
 #include <cstring>
+#include <sys/types.h> //
+#include <sys/stat.h>
 #include "cpplocate.hpp"
 #include "mapping.h"
 #include "subprocess.hpp"
@@ -47,15 +49,15 @@ std::vector<std::string> CATH_ListFiles(std::string path);
 
 void Progress_Indicator(std::string text, long long current, long long total);
 
-int system_call_err(std::string command, std::string& stdout);
-
-std::string system_call(std::string command);
+// int system_call_err(std::string command, std::string& stdout);
 
 void ltrim(std::string &s);
 
 void rtrim(std::string &s);
 
 std::string trim(std::string s);
+
+int DirectoryExists(std::string fDir);
 
 bool FileExists(std::string fName);
 
@@ -64,6 +66,8 @@ size_t FileSize(std::istream &isObj);
 std::string FileBasename(std::string filename);
 
 std::string File_md5(std::string fName);
+
+int CountFilesInDir(std::string fDir);
 
 long double UniformRand(int lb, int ub);
 
