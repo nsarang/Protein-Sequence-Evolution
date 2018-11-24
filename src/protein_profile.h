@@ -31,15 +31,20 @@ class ProteinProfile {
 
 public:
 	ProteinProfile(Protein target);
-	void CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS, bool bVerbose = true,
-	                       bool bSave_Frags = true, double dPotS_Param = Pot_S_Constant,
-	                       double dFrag_Score_Cutoff = DIST_CUTOFF, double dGap_Penalty = GAP_PENALTY,
+	void CalculateProfiles(int nFlag = 1 + 2 + 4 + 8,
+	                       bool bVerbose = true,
+	                       bool bSave_Frags = true,
+	                       double dFrag_Score_Cutoff = DIST_CUTOFF,
+	                       double dGap_Penalty = GAP_PENALTY,
+	                       double dPotS_Param = Pot_S_Constant,
 	                       int nMin_Frag = FRAG_MIN_LEN);
+
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
 	                              double dAlgn_Score_CutOff, double bVerbose);
+
 	void Read_FromFile(std::string sDirectory = db_Profiles);
 	void Write_ToFile(std::string sDirectory = db_Profiles, bool bWriteCounts = false);
-	std::string QuickInfo(bool bIncludeAlignment = false);
+	std::string QuickInfo(bool bIncludeAlignInfo = false);
 
 
 private:

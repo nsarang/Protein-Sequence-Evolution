@@ -7,70 +7,57 @@ ProteinProfile::ProteinProfile(Protein target)
 {
     _aAlgn_Profile.resize(_refProtein.length());
     _aAlgn_Position_Count.resize(_refProtein.length());
-    _matFragments.resize(_refProtein.length(), std::vector<std::vector<std::string> >( _refProtein.length() ));
-
-    for (int i = 0; i < _refProtein.length(); ++i)
-        for (int j = 0; j < 7; ++j)
-            assert(_aAlgn_Profile[i][j] == 0);
-    for (int i = 0; i < 20; ++i) {
-        for (int j = 0; j < 7; ++j)
-        {
-            assert(_aSolvent_Profile[i][j] == 0);
-            assert(_aSec_Profile[i][j] == 0 && _aSec_Profile[i][j] == _aSec_Profile[i][j]);
-            assert(_aSolvent_AA_Count[i][j] == 0);
-            assert(_aSec_AA_Count[i][j] == 0);
-        }
-    }
+    _matFragments.resize(_refProtein.length(),
+                         std::vector<std::vector<std::string> >( _refProtein.length() ));
 }
 
 
-void ProteinProfile::CalculateProfiles(bool bAlgn, bool bSolvent, bool bPot, bool bSS,
-                                       bool bVerbose, bool bSave_Frags, double dPotS_Param,
-                                       double dFrag_Score_Cutoff, double dGap_Penalty, int nMin_Frag)
+
+void ProteinProfile::CalculateProfiles(int nFlag,
+                                       bool bVerbose = true,
+                                       bool bSave_Frags = true,
+                                       double dFrag_Score_Cutoff = DIST_CUTOFF,
+                                       double dGap_Penalty = GAP_PENALTY,
+                                       double dPotS_Param = Pot_S_Constant,
+                                       int nMin_Frag = FRAG_MIN_LEN)
 {
     if (_vecHomologous_Proteins.empty()) {
         std::cerr << "FatalError: No protein to process.";
         return;
     }
 
-
     std::vector<std::function<void(Protein&)> > vecProcFuncs;
     std::vector<std::function<void()> > vecCalcFuncs;
     std::string Msg = "Calculating ";
-//    std::cerr << Msg << std::endl;
 
-    if (bAlgn) {
+    if (nFlag & 1) {
         vecCalcFuncs.push_back([ = ] { Calculate_Alignment_Profile(bSave_Frags, dFrag_Score_Cutoff,
                                        dGap_Penalty, nMin_Frag);
                                      });
         Msg += "Algn, ";
     }
-    if (bSolvent) {
+    if (nFlag & 2) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_Solvent, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_Solvent_Profile, this));
         Msg += "Solvent, ";
     }
-    if (bPot) {
+    if (nFlag & 4) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_Pot_AAFreq, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_Pot_AAFreq_Profile, this));
         _dPotS_Param = dPotS_Param;
         Msg += "Pot, ";
     }
-    if (bSS) {
+    if (nFlag * 8) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_SS, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_SS_Profile, this));
         Msg += "SS, ";
     }
     Msg.erase(Msg.size() - 2);
     Msg += " profiles";
-//    std::cerr << Msg << std::endl;
 
     Thread_Manager(vecProcFuncs, _vecHomologous_Proteins, bVerbose, Msg);
-//   std::cerr << "done>1\njk???\noll";
     for (auto CalcFunction : vecCalcFuncs)
         CalcFunction();
-//    std::cerr << "famm\njkmmmm???";
-
 }
 
 
@@ -125,16 +112,10 @@ template<class FuncType, class Args>
 void ProteinProfile::Processing_Thread(std::vector<std::function<FuncType> > vecFuncs,
                                        std::vector<Args> vecBatch, int& nCount_Now)
 {
-    int i = 0;
     for (auto& data : vecBatch) {
-        i++;
-        int j = 0;
-        //   std::cerr << i << "\n";
-        for (auto ProcFunction : vecFuncs) {
+        for (auto ProcFunction : vecFuncs)
             ProcFunction(data);
-            j++;
-            //        std::cerr << "THRD " << i << " " << j << " " << vecBatch.size() << "\n";
-        }
+
         std::lock_guard<std::mutex> lock(_mtx_count);
         nCount_Now++;
     }
@@ -210,18 +191,15 @@ void ProteinProfile::Process_Pot_AAFreq(Protein& target) {
 }
 
 
+
 void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, double dFrag_Score_Cutoff,
         double dGap_Penalty, int nMin_Frag)
 {
-//    std::cerr << __PRETTY_FUNCTION__ << "\n";
-
     _dFrag_Score_Cutoff = dFrag_Score_Cutoff;
     _dGap_Penalty = dGap_Penalty;
     _nMin_Frag = nMin_Frag;
-//    std::cerr << "Rdy\n";
-    for (auto& [score, seq1, seq2, atom_dist] : _vecTupleAlignments) {
 
-//        std::cerr << score << " " << seq1 << " " << seq2 << "\n";
+    for (auto& [score, seq1, seq2, atom_dist] : _vecTupleAlignments) {
         int align_len = seq1.length();
         std::vector<double> sum_dist( align_len + 1 );
 
@@ -229,23 +207,21 @@ void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, double dFrag_
             sum_dist[i] = (atom_dist[i] == GAP_NUMBER ? _dGap_Penalty : atom_dist[i])
                           + sum_dist[i - 1];
 
-
         for (int i = 0, pos = 0; i < align_len; ++i) {
             if (seq1[i] == '-')
                 continue;
-
             pos++;
             if (seq2[i] == '-' || seq2[i] == 'X')
                 continue;
 
             assert(algn_classes.count(seq2[i]) != 0);
             int nClass = algn_classes[seq2[i]];
-//           std::cerr << pos << " " << nClass << " " << _aAlgn_Profile.size() << " " << "\n";
+
             _aAlgn_Profile[pos - 1][nClass] += 10 - std::min(10., atom_dist[i + 1]); // Convert to similarity
             _aAlgn_Position_Count[pos - 1]++;
             _aAlgn_Class_Count[nClass]++;
         }
-//        std::cerr << "save frags\n";
+
         if (bSave_Frags) {
             int pos = 0;
             for (int i = 0; i < align_len; ++i) {
@@ -365,6 +341,7 @@ void ProteinProfile::Calculate_Pot_AAFreq_Profile() {
 
 
 void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
+    assert(DirectoryExists(sDirectory));
 
     if (bSolvent_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("solvent"));
@@ -379,7 +356,7 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
             outFile << "\n";
         }
     }
-    std::cerr << "CHECK1\n" << "\n";
+
     if (bSS_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("sec"));
 
@@ -393,7 +370,6 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
             outFile << "\n";
         }
     }
-    std::cerr << "CHECK2\n" << "\n";
 
     if (bPot_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("pot"));
@@ -411,7 +387,6 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
                     << _aAA_Freq_Mean[i] << " " << _aAA_Freq_Stdev[i] << "\n";
 
     }
-    std::cerr << "CHECK3\n" << "\n";
 
     if (bAlgn_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("alignment"));
@@ -423,7 +398,6 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
                 outFile << " " << std::fixed << std::setprecision(10) << _aAlgn_Profile[i][j];
             outFile << "\n";
         }
-        std::cerr << "CHECK4\n" << "\n";
 
         if (bFrags_Rdy) {
             std::ofstream outFile(sDirectory + RelativeFileName("fragment"));
@@ -435,7 +409,6 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
         }
 
     }
-    std::cerr << "CHECK5\n" << "\n";
 
     if (bWriteCounts) {
         std::ofstream outFile(sDirectory + RelativeFileName("count"));
@@ -465,6 +438,7 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, bool bWriteCounts) {
 
 
 void ProteinProfile::Read_FromFile(std::string sDirectory) {
+    assert(DirectoryExists(sDirectory));
     std::string HEAD;
     double PARAM;
 
@@ -574,7 +548,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
 }
 
 
-std::string ProteinProfile::QuickInfo(bool bIncludeAlignment) {
+std::string ProteinProfile::QuickInfo(bool bIncludeAlignInfo) {
     std::ostringstream output;
     output << "FILE_PATH:  " << _refProtein.fPath << "\n"
            << "MD5:  " << _refProtein.md5 << "\n"
@@ -582,7 +556,7 @@ std::string ProteinProfile::QuickInfo(bool bIncludeAlignment) {
            << "TEMPLATES_COUNT:  " << _vecHomologous_Proteins.size() << "\n"
            << "ALGN_SCORE_CUTOFF:  " << _dAlgn_Score_CutOff << "\n"
            << "POT_S_PARAMETER:  " << _dPotS_Param << "\n";
-    if (bIncludeAlignment) {
+    if (bIncludeAlignInfo) {
         output << "FRAG_DIST_CUTOFF:  " << _dFrag_Score_Cutoff << "\n"
                << "GAP_PENALTY:  " << _dGap_Penalty << "\n"
                << "MIN_FRAG_LENGTH:  " << _nMin_Frag << "\n";
