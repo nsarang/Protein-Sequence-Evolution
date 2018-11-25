@@ -30,16 +30,16 @@ void ProteinProfile::CalculateProfiles(int nFlag,
     std::vector<std::function<void()> > vecCalcFuncs;
     std::string Msg = "Calculating ";
 
+
     if (nFlag & 1) {
-        vecCalcFuncs.push_back([ = ] { Calculate_Alignment_Profile(bSave_Frags, dFrag_Score_Cutoff,
-                                       dGap_Penalty, nMin_Frag);
-                                     });
-        Msg += "Algn, ";
-    }
-    if (nFlag & 2) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_Solvent, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_Solvent_Profile, this));
         Msg += "Solvent, ";
+    }
+    if (nFlag & 2) {
+        vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_SS, this, _1));
+        vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_SS_Profile, this));
+        Msg += "SS, ";
     }
     if (nFlag & 4) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_Pot_AAFreq, this, _1));
@@ -48,16 +48,29 @@ void ProteinProfile::CalculateProfiles(int nFlag,
         Msg += "Pot, ";
     }
     if (nFlag & 8) {
-        vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_SS, this, _1));
-        vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_SS_Profile, this));
-        Msg += "SS, ";
+        vecCalcFuncs.push_back([ = ] { Calculate_Alignment_Profile(bSave_Frags, dFrag_Score_Cutoff,
+                                       dGap_Penalty, nMin_Frag);
+                                     });
+        Msg += "Algn, ";
     }
+
     Msg.erase(Msg.size() - 2);
     Msg += " profiles";
 
     Thread_Manager(vecProcFuncs, _vecHomologous_Proteins, bVerbose, Msg);
     for (auto CalcFunction : vecCalcFuncs)
         CalcFunction();
+}
+
+
+
+void ProteinProfile::CalculateRemainingProfiles(bool bVerbose) {
+    int nFlag = 0;
+    bool abFlags[] = {bSolvent_Rdy, bSS_Rdy, bPot_Rdy, bAlgn_Rdy};
+    for (int i = 0, j = 1; i < 4; ++i, j *= 2)
+        if (abFlags[i])
+            nFlag += j;
+    CalculateProfiles(nFlag, bVerbose);
 }
 
 
@@ -247,7 +260,7 @@ void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, double dFrag_
                 }
                 if (seq1[i] != '-')
                     pos++;
-            } 
+            }
         }
     }
 
