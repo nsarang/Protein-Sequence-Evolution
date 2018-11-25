@@ -15,36 +15,22 @@
 #include <dirent.h>
 #include <cerrno>
 #include <cstring>
-#include <sys/types.h> //
+#include <sys/types.h>
 #include <sys/stat.h>
 #include "cpplocate.hpp"
 #include "mapping.h"
 #include "subprocess.hpp"
 
 
-#define RESET   "\033[0m"
-#define BOLDRED     "\033[1m\033[31m"
-#define BOLDGREEN   "\033[1m\033[32m"
-#define BUFFERSIZE 1024
+namespace utility {
+
+const char RESET[] = "\033[0m";
+const char BOLDRED[] = "\033[1m\033[31m";
+const char BOLDGREEN[] = "\033[1m\033[32m";
+const int BUFFERSIZE = 1024;
 
 
 
-
-// TYPE DEFINITIONS
-/*
-struct AminoAcid {
-    AminoAcid(std::string iname, double x = 0, double y = 0, double z = 0,
-              int count = 0)
-        : name( iname ), neighbour_count( count ), cords( std::tie(x, y, z)) {}
-
-    std::string name;
-    int neighbour_count;
-    std::tuple<double, double, double> cords;
-};
-*/
-
-
-// FUNCTIONS
 std::vector<std::string> CATH_ListFiles(std::string path);
 
 void Progress_Indicator(std::string text, long long current, long long total);
@@ -70,6 +56,9 @@ std::string File_md5(std::string fName);
 int CountFilesInDir(std::string fDir);
 
 long double UniformRand(int lb, int ub);
+
+
+} // namespace
 
 
 

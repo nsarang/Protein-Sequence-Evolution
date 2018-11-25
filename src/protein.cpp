@@ -3,7 +3,7 @@
 
 
 Protein::Protein(std::string fPath, int nFlag, double dPotS_Param)
-    : fPath( fPath ), md5( File_md5(fPath) )
+    : fPath( fPath ), md5( utility::File_md5(fPath) )
 {
     Parse_PDB(fPath, vecAmino_Acid);
     for (auto& amino_acid : vecAmino_Acid)
@@ -29,16 +29,16 @@ void Protein::Parse_PDB(std::string fPath, std::vector<AminoAcid> &retVec) {
         if (line.size() < 47 || line.substr(0, 4) != "ATOM")
             continue;
 
-        std::string atom_name = trim(line.substr(12, 4));
+        std::string atom_name = utility::trim(line.substr(12, 4));
         if (atom_name != "CA" || !(line[16] == 'A' || line[16] == ' ' || line[16] == '1'))
             continue;
 
         retVec.emplace_back(AminoAcid(
                                 resName_to_sym.count(line.substr(17, 3)) ?  line.substr(17, 3) : "UNK",
                                 ' ',
-                                std::stod(trim(line.substr(30, 8))),
-                                std::stod(trim(line.substr(38, 8))),
-                                std::stod(trim(line.substr(46, 8)))
+                                std::stod(utility::trim(line.substr(30, 8))),
+                                std::stod(utility::trim(line.substr(38, 8))),
+                                std::stod(utility::trim(line.substr(46, 8)))
                             ));
 
         retVec.back().symbol = resName_to_sym[retVec.back().name];

@@ -10,7 +10,7 @@ DFIRE2::DFIRE2(std::string libPath, bool bVerbose) {
 
 
 void DFIRE2::ReadLib(std::string libPath, bool bVerbose) {
-	if (!FileExists(libPath))
+	if (!utility::FileExists(libPath))
 		throw std::runtime_error("ERR: dDFIRE energy file not found!");
 
 	std::string HEAD, AA_name1, AA_name2,
@@ -51,10 +51,10 @@ void DFIRE2::ReadLib(std::string libPath, bool bVerbose) {
 			edDFIRE[id2][id1][i] = edDFIRE[id1][id2][i];  // symmetry
 		}
 		if (bVerbose)
-			Progress_Indicator("dDFIRE energy file", count_now++, total);
+			utility::Progress_Indicator("dDFIRE energy file", count_now++, total);
 	}
 	if (bVerbose)
-		Progress_Indicator("dDFIRE energy file", 1, 1);
+		utility::Progress_Indicator("dDFIRE energy file", 1, 1);
 	libReady = true;
 }
 

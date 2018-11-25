@@ -3,6 +3,9 @@
 namespace sp = subprocess;
 
 
+namespace utility {
+
+
 std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
     std::vector<std::string> vecProcessedDB;
     DIR *hDir;
@@ -148,3 +151,5 @@ int CountFilesInDir(std::string fDir) {
 long double UniformRand(int lb, int ub) {
     return lb + (long double)rand() / (RAND_MAX) * (ub - lb);
 }
+
+} // namespace

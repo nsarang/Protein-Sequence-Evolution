@@ -2,7 +2,7 @@
 
 
 Evaluator::Evaluator(std::string fPath) {
-    assert(FileExists(fPath));
+    assert(utility::FileExists(fPath));
 
     std::ifstream inFile(fPath);
     int n; std::string HEAD;

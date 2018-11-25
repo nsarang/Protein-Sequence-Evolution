@@ -43,7 +43,7 @@ public:
 	                              double dAlgn_Score_CutOff, double bVerbose);
 
 	void Read_FromFile(std::string sDirectory = db_Profiles);
-	void Write_ToFile(std::string sDirectory = db_Profiles, bool bWriteCounts = false);
+	void Write_ToFile(bool bWriteCounts = false, std::string sDirectory = db_Profiles);
 	std::string QuickInfo(bool bIncludeAlignInfo = false);
 
 
