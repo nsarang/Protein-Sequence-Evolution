@@ -51,8 +51,9 @@ public:
 private:
 	template<class FuncType, class vecType>
 	void Thread_Manager(std::vector<std::function<FuncType> > vecFunctions,
-	                    std::vector<vecType>& vecDatabase, bool bVerbose = false,
-	                    std::string sMsg = "", int nThreads = 12);
+	                    std::vector<vecType>& vecDatabase,
+	                    bool bVerbose = false, std::string sMsg = "",
+	                    int nThreads = std::thread::hardware_concurrency());
 
 	template<class FuncType, class vecType>
 	void Processing_Thread(std::vector<std::function<FuncType> > vecFunctions,

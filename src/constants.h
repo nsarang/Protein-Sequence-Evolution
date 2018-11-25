@@ -16,6 +16,10 @@ const std::string sFileStartSym = "~^&%@";
 #define M_EPS 1e-15
 
 
+// THREAD
+const int FALLBACK_THRD_NUM = 8;
+
+
 // PROTEIN
 const int MAX_PROT_LEN = 2000,
           AA_TYPE = 20;

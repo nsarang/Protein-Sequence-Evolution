@@ -99,6 +99,8 @@ void ProteinProfile::Thread_Manager(std::vector<std::function<FuncType> > vecFun
     int size = vecDB.size(),
         nCount_Now = 0;
 
+    nThreads = (nThreads > 0 ? nThreads : FALLBACK_THRD_NUM);
+
     for (int i = 0; i < nThreads; ++i) {
         std::vector vecBatch(vecDB.begin() + i * size / nThreads,
                              vecDB.begin() + (i + 1) * (size) / nThreads);
