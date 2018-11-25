@@ -5,4 +5,4 @@ Rzbny SS Parse/
 _History/
 _Tests/
 *.o
-src./.depend
+src/.depend
