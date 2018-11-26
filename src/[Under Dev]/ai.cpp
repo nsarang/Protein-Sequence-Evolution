@@ -1,3 +1,12 @@
+/*
+
+THIS FILE IS NOT COMPATIBLE WITH THE NEWER VERSION
+
+*/
+
+
+
+
 #include "ai.h"
 
 

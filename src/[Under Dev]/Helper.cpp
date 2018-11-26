@@ -1,10 +1,11 @@
-//
-//  ProtEvol.cpp
-//  Protein Sequence Evolution
-//
-//  Created by Nima Sarang on 2018-02-18.
-//  Copyright © 2018 Nima Sarang. All rights reserved.
-//
+/*
+
+THIS FILE IS NOT COMPATIBLE WITH THE NEWER VERSION
+
+*/
+
+
+
 
 // INCLUDES
 #include <iostream>

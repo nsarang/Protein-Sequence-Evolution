@@ -1,3 +1,12 @@
+/*
+
+THIS FILE IS NOT COMPATIBLE WITH THE NEWER VERSION
+
+*/
+
+
+
+
 #ifndef __AI_H__
 #define __AI_H__
 

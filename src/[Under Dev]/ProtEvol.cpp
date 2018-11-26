@@ -1,3 +1,12 @@
+/*
+
+THIS FILE IS NOT COMPATIBLE WITH NEW VERSION
+
+*/
+
+
+
+
 //
 //  ProtEvol.cpp
 //  Protein Sequence Evolution
