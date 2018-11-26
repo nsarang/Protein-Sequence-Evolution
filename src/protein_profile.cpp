@@ -346,6 +346,14 @@ void ProteinProfile::Calculate_Pot_AAFreq_Profile() {
 void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
     assert(utility::DirectoryExists(sDirectory));
 
+    {
+        std::ofstream outFile(sDirectory + RelativeFileName("family"));
+        outFile << QuickInfo(true) << "\n\n" << "#PROTEIN_FAMILY\n\n"
+                << sFileStartSym << "\n";
+        for (auto P : _vecHomologous_Proteins)
+            outFile << P.fPath << "\n";
+    }
+
     if (bSolvent_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("solvent"));
 
@@ -446,10 +454,20 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
     std::string HEAD;
     double PARAM;
 
+    {
+        std::ifstream inFile(sDirectory + RelativeFileName("family"));
+        while (HEAD != sFileStartSym)
+            inFile >> HEAD;
+        while (std::getline(inFile, HEAD))
+            if (HEAD != "")
+                _vecHomologous_Proteins.emplace_back(Protein(HEAD));
+    }
+
     std::string fSolvName = sDirectory + RelativeFileName("solvent");
     if (utility::FileExists(fSolvName)) {
         std::ifstream inFile(fSolvName);
 
+        HEAD = "";
         while (HEAD != sFileStartSym)
             inFile >> HEAD;
 
@@ -561,6 +579,8 @@ std::string ProteinProfile::QuickInfo(bool bIncludeAlignInfo) {
            << "TEMPLATES_COUNT:  " << _vecHomologous_Proteins.size() << "\n"
            << "ALGN_SCORE_CUTOFF:  " << _dAlgn_Score_CutOff << "\n"
            << "POT_S_PARAMETER:  " << _dPotS_Param << "\n";
+
+    bIncludeAlignInfo &= bAlgn_Rdy;
     if (bIncludeAlignInfo) {
         output << "FRAG_DIST_CUTOFF:  " << _dFrag_Score_Cutoff << "\n"
                << "GAP_PENALTY:  " << _dGap_Penalty << "\n"
@@ -591,6 +611,9 @@ std::string ProteinProfile::RelativeFileName(std::string sPN) {
 
     if (sPN == "Counts" || sPN == "count" || sPN == "counts")
         return "Counts_" + md5_First15;
+
+    if (sPN == "fam" || sPN == "Family" || sPN == "family")
+        return "Family_" + md5_First15;
 
     throw std::runtime_error("Unknown profile name.");
 }
