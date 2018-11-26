@@ -1,54 +1,34 @@
 #include "utility.h"
-#include <iostream>
-#include <fstream>
-#include <array>
-#include <algorithm>
-#include "cpplocate.h"
+
+namespace sp = subprocess;
 
 
+namespace utility {
 
 
+std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
+    std::vector<std::string> vecProcessedDB;
+    DIR *hDir;
+    dirent *hFile;
+    assert(hDir = opendir(sDB_Path.c_str()));
+    int total = CountFilesInDir(sDB_Path);
 
-double dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2) {
-    double dx = std::get<0>(t1) - std::get<0>(t2),
-           dy = std::get<1>(t1) - std::get<1>(t2),
-           dz = std::get<2>(t1) - std::get<2>(t2);
-    return std::sqrt(dx * dx + dy * dy + dz * dz);
-}
-
-
-bool IsStandardAA(std::string abrv)
-{
-    return !(abrv == "ASX" || abrv == "GLX" || abrv == "SEC" || abrv == "PYL" || abrv == "UNK");
-}
-
-
-void ParsePDB(std::string fPath, std::vector<AminoAcid> &vecAminoAcid) {
-    vecAminoAcid.clear();
-    std::ifstream inFile(fPath);
-    std::string line;
-
-     while (getline(inFile, line)) {
-        if (line.size() < 47 || line.substr(0, 4) != "ATOM")
+    vecProcessedDB.reserve(total);
+    while ((hFile = readdir(hDir))) {
+        std::string fName = hFile->d_name;
+        if (fName.size() != 7 || !isdigit(fName[0]))
             continue;
 
-        std::string atom_name = trim(line.substr(12, 4));
-        if (atom_name != "CA" || !(line[16] == 'A' || line[16] == ' ' || line[16] == '1'))
-            continue;
-
-        vecAminoAcid.emplace_back(AminoAcid(
-                                         line.substr(17, 3),
-                                         std::stod(trim(line.substr(30, 8))),
-                                         std::stod(trim(line.substr(38, 8))),
-                                         std::stod(trim(line.substr(46, 8)))
-                                     ));
-        assert(residue_map.count(vecAminoAcid.back().name) > 0);
+        vecProcessedDB.push_back(sDB_Path + fName);
     }
+    return vecProcessedDB;
 }
 
 
-void progress_indicator(std::string text, long long current, long long total) {
-    std::cout << (current != 0 ?  "\r\033[F" : "" ) << text << ": ";
+void Progress_Indicator(std::string text, long long current, long long total) {
+    if (current == 0)
+        std::cout << "|\n";
+    std::cout << "\r\033[F" << text << ": ";
     int percent = current * 100 / total;
     if (percent == 100)
         std::cout << BOLDGREEN << "OK " << RESET << std::endl;
@@ -57,11 +37,14 @@ void progress_indicator(std::string text, long long current, long long total) {
 }
 
 
+/*
 int system_call_err(std::string command, std::string& stdout) {
     std::array<char, BUFFERSIZE> buffer;
 
     FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) throw std::runtime_error("popen() failed!\ncommand: " + command);
+    if (!pipe) {
+        throw std::runtime_error(std::string() + "popen() failed!:\t" + strerror(errno) + "\ncommand: " + command);
+    }
     try {
         while (!feof(pipe))
             if (fgets(buffer.data(), BUFFERSIZE, pipe) != NULL)
@@ -71,26 +54,11 @@ int system_call_err(std::string command, std::string& stdout) {
         throw;
     }
     int wstat = pclose(pipe);
+    pclose(pipe);
     return WEXITSTATUS(wstat);
 }
+*/
 
-
-std::string system_call(std::string command) {
-    std::array<char, BUFFERSIZE> buffer;
-    std::string result = "";
-
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) throw std::runtime_error("popen() failed!\ncommand: " + command);
-    try {
-        while (!feof(pipe))
-            if (fgets(buffer.data(), BUFFERSIZE, pipe) != NULL)
-                result += buffer.data();
-    } catch (...) {
-        pclose(pipe);
-        throw;
-    }
-    return result;
-}
 
 
 inline void ltrim(std::string &s) {
@@ -109,6 +77,27 @@ std::string trim(std::string s) {
     ltrim(s);
     rtrim(s);
     return s;
+}
+
+
+/******************************************************************************
+ * Checks to see if a directory exists. Note: This method only checks the
+ * existence of the full path AND if path leaf is a dir.
+ *
+ * @return  >0 if dir exists AND is a dir,
+ *           0 if dir does not exist OR exists but not a dir,
+ *          <0 if an error occurred like dir isn't accessible (errno is also set)
+ *****************************************************************************/
+int DirectoryExists(std::string fDir) {
+    struct stat info;
+
+    int statRC = stat( fDir.c_str(), &info );
+    if ( statRC != 0 ) {
+        if (errno == ENOENT)  { return 0; } // something along the path does not exist
+        if (errno == ENOTDIR) { return 0; } // something in path prefix is not a dir
+        return -1;
+    }
+    return ( info.st_mode & S_IFDIR ) ? 1 : 0;
 }
 
 
@@ -140,15 +129,27 @@ std::string FileBasename(std::string filename) {
 
 
 std::string File_md5(std::string fName) {
-    std::string md5 = "md5 -r ";
 #if defined(__linux__)
-        md5 = "md5sum";
+    std::string ret = sp::check_output({"md5sum", fName.c_str()}).buf.data();
+#else
+    std::string ret = sp::check_output({"md5", "-r", fName.c_str()}).buf.data();
 #endif
-    std::string ret = system_call("md5 -r " + fName);
     return ret.substr(0, ret.find(' '));
+}
+
+
+int CountFilesInDir(std::string fDir) {
+    auto ls = sp::Popen({"ls", fDir.c_str()}, sp::output{sp::PIPE});
+    auto wc = sp::Popen({"wc", "-l"},
+                                sp::input{ls.output()},
+                                sp::output{sp::PIPE});
+    auto res = wc.communicate().first;
+    return std::stoi(res.buf.data());
 }
 
 
 long double UniformRand(int lb, int ub) {
     return lb + (long double)rand() / (RAND_MAX) * (ub - lb);
 }
+
+} // namespace

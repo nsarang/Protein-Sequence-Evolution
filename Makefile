@@ -1,5 +1,5 @@
 all: 
-	$(MAKE) -C src
+	$(MAKE) -C src all
 	$(MAKE) -C STRIDE/src
 	$(MAKE) -C TMalign/src
 

@@ -21,6 +21,7 @@
 #include <sstream>
 #include <set>
 #include <iomanip>
+#include "protein.h"
 #include "constants.h"
 #include "cpplocate.h"
 #include "statistics.h"
@@ -32,7 +33,7 @@
 #include "evaluation.h"
 #include "init.h"
 #include "ai.h"
-#include "helper.cpp"
+// #include "helper.cpp"
 #define _USE_MATH_DEFINES
 
 
@@ -56,9 +57,9 @@ int main(int argc, const char * argv[]) {
     auto AI_Obj = AI();
 
     // std::string rett = AI_Obj.AntColonyOptimization(10, 50, 1, 3, 1, 0.5);
-    std::string orig = GetSec(target_path);
-    std::cerr << "ORIG: " << orig << "\n";
-    std::cout << AI_Obj.Initial_State(orig.size()) << "\n";
+  //  std::string orig = GetSec(target_path);
+ //   std::cerr << "ORIG: " << orig << "\n";
+  //  std::cout << AI_Obj.Initial_State(orig.size()) << "\n";
     // EVAL(rett, orig);
     return 0;
     // AI_Obj.ParticleSwarmOptimization(500, 10000);

@@ -3,16 +3,14 @@
 
 #include <gsl/gsl_multifit.h>
 #include <gsl/gsl_statistics_double.h>
-#include <cmath>
 #include <vector>
+#include <tuple>
+#include <cassert>
 #include <algorithm>
 
 
-#define M_EPS 1e-15
 
-
-
-void Mean_SD(std::vector<double> &vec, double &ret_mean, double &ret_stdev);
+std::tuple<double, double> Mean_SD(std::vector<double> &vecInp);
 
 std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double coef = 1.5);
 

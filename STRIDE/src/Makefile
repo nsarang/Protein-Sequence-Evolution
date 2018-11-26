@@ -13,7 +13,7 @@ SOURCE = stride.c splitstr.c rdpdb.c initchn.c geometry.c thr2one.c one2thr.c fi
 
 OBJECT = ${SOURCE:.c=.o} 
 
-BINDIR = ../
+BINDIR = ..
 
 .c.o: 
 	$(CC) -c $< -o $@

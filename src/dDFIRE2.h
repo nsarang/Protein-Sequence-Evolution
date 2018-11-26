@@ -5,22 +5,27 @@
 #include <array>
 #include <unordered_map>
 #include <fstream>
+#include <vector>
 #include "constants.h"
 #include "mapping.h"
-#include "utility.h" 
-
-
-extern std::unordered_map<std::string, int> atom_map;
-extern double edDFIRE[MAX_TYPES][MAX_TYPES][MAX_BIN];
-extern int num_types, num_bins;
+#include "utility.h"
+#include "protein.h"
 
 
 
-// FUNCTIONS
-void dDFIRE_ReadLib(std::string libPath);
 
-double dDFIRE_CFE(std::string& target_sequence,
-                  std::array<std::array<double, MAX_PROT_LEN>, MAX_PROT_LEN> &target_atom_distance);
+class DFIRE2 {
+public:
+	DFIRE2(std::string libPath, bool bVerbose = false);
+	void ReadLib(std::string libPath, bool bVerbose);
+	double Calc_CFE(Protein& target);
+private:
+	int nTypes, nBins;
+	bool libReady;
+	std::unordered_map<std::string, int> atom_map;
+	std::vector<std::vector<std::vector<double> > > edDFIRE; // 3D vector
+};
+
 
 
 #endif // _DDFIRE2_H
