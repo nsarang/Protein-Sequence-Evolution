@@ -32,7 +32,7 @@ class ProteinProfile {
 public:
 	ProteinProfile(Protein target);
 	void CalculateProfiles(int nFlag = 1 + 2 + 4 + 8,
-	                       bool bVerbose = true,
+	                       bool bVerbose = false,
 	                       bool bSave_Frags = true,
 	                       double dFrag_Score_Cutoff = DIST_CUTOFF,
 	                       double dGap_Penalty = GAP_PENALTY,
@@ -41,7 +41,7 @@ public:
 
 	void CalculateRemainingProfiles(bool bVerbose = true);
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
-	                              double dAlgn_Score_CutOff, double bVerbose);
+	                              double dAlgn_Score_CutOff, double bVerbose = false);
 
 	void Read_FromFile(std::string sDirectory = db_Profiles);
 	void Write_ToFile(bool bWriteCounts = false, std::string sDirectory = db_Profiles);
