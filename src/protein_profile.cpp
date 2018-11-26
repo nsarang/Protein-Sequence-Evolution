@@ -594,3 +594,15 @@ std::string ProteinProfile::RelativeFileName(std::string sPN) {
 
     throw std::runtime_error("Unknown profile name.");
 }
+
+
+
+bool ProteinProfile::FragmentExists(int i, int j) {
+    return !_matFragments[i][j].empty();
+}
+
+
+
+std::string ProteinProfile::FragmentFetch(int i, int j) {
+    return _matFragments[i][j][rand() % _matFragments[i][j].size()];
+}

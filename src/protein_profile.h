@@ -46,6 +46,8 @@ public:
 	void Read_FromFile(std::string sDirectory = db_Profiles);
 	void Write_ToFile(bool bWriteCounts = false, std::string sDirectory = db_Profiles);
 	std::string QuickInfo(bool bIncludeAlignInfo = false);
+	bool FragmentExists(int i, int j);
+	std::string FragmentFetch(int i, int j);
 
 
 private:
