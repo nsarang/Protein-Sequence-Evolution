@@ -39,6 +39,7 @@ class Protein {
 public:
 	Protein(std::string fPath, int nFlag = 0, double dPotS_Param = Pot_S_Constant);
 	static void Parse_PDB(std::string fPath, std::vector<AminoAcid>& retVec);
+	
 	double CA_Atom_Distance(int i, int j);
 	std::string Get_Sequence();
 	int length();
@@ -49,10 +50,10 @@ public:
 	void Calculate_SS(bool bForceCalc = false);
 	void Calculate_Pot(double dPotS_Param, bool bForceCalc = false);
 
-//private:
-	double dist(std::tuple<double, double, double>&, std::tuple<double, double, double> &t);
-	bool IsStandardAA(std::string abrv);
-	bool IsStandardAA(char symbol);
+private:
+	static double dist3D(std::tuple<double, double, double>&, std::tuple<double, double, double> &t);
+	static bool IsStandardAA(std::string abrv);
+	static bool IsStandardAA(char symbol);
 
 	std::string sequence,
 	    fPath,

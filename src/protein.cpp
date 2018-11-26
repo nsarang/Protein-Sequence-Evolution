@@ -77,7 +77,7 @@ void Protein::Calculate_Distances(bool bForceCalc) {
     for (int i = 0; i < length(); ++i) {
         for (int j = i + 1; j < length(); ++j)
         {
-            double d = dist(vecAmino_Acid[i].cords, vecAmino_Acid[j].cords);
+            double d = dist3D(vecAmino_Acid[i].cords, vecAmino_Acid[j].cords);
             vecAtom_Distance[i][j] = vecAtom_Distance[j][i] = d;
         }
     }
@@ -178,20 +178,18 @@ void Protein::Calculate_Pot(double dPotS_Param, bool bForceCalc) {
         }
 
     for (int i = 0; i < 20; ++i) {
- //       std::cerr << i << "\t" << n << " " << aAA_Freqs[i] << "\n";
         if (AA_freq[i] < 2)
             continue;
 
         aPot_Values[i] = (pot1[i] - pot0[i]) / var0[i];
         aAA_Freqs[i] = AA_freq[i] / n;
-      //  std::cerr << i << "\t" << AA_freq[i] << " " << n << " " << aAA_Freqs[i] << "\n";
     }
 
     bPot_Rdy = true;
 }
 
 
-double Protein::dist(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2) {
+double Protein::dist3D(std::tuple<double, double, double> &t1, std::tuple<double, double, double> &t2) {
     double dx = std::get<0>(t1) - std::get<0>(t2),
            dy = std::get<1>(t1) - std::get<1>(t2),
            dz = std::get<2>(t1) - std::get<2>(t2);

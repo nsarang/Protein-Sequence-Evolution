@@ -35,9 +35,9 @@ public:
 	                                      std::array<double, 20>& aAA_Freq_Mean,
 	                                      std::array<double, 20>& aAA_Freq_Stdev);
 
-	double eNormalaize(double e, double lB, double uB);
-
+	static double eNormalaize(double e, double lB, double uB);
 	double operator()(Protein &target, ProteinProfile& profiles, DFIRE2& dDFIRE_Inst);
+
 private:
 	std::vector<std::vector<double> > _vecWeights;
 };
