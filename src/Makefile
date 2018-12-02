@@ -2,7 +2,7 @@
 
 CC= gcc-8
 CXX=g++-8
-CPPFLAGS = -std=c++17 -c -Wall -pedantic -O3
+CPPFLAGS = -std=c++17 -g -Wall -pedantic
 LDLIBS = -lm -lgsl -lgslcblas -L. -pthread
 RM=rm -f
 
