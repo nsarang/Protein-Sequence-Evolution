@@ -76,7 +76,8 @@ void ProteinProfile::CalculateRemainingProfiles(bool bVerbose) {
 
 
 void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB,
-        double dAlgn_Score_CutOff, double bVerbose)
+        double bVerbose,
+        double dAlgn_Score_CutOff)
 {
     _vecHomologous_Proteins.clear();
     _vecTupleAlignments.clear();
@@ -243,26 +244,31 @@ void ProteinProfile::Calculate_Alignment_Profile(bool bSave_Frags, double dFrag_
             int pos = 0;
             for (int i = 0; i < align_len; ++i) {
                 for (int l = nMin_Frag; i + l <= align_len; ++l) {
-                    if (atom_dist[i + 1] == 0 || atom_dist[i + l] == 0)
-                        continue;
+                    //   if (atom_dist[i + 1] == 0 || atom_dist[i + l] == 0)
+                    //       continue;
+
                     double sc = sum_dist[i + l] - sum_dist[i];
                     assert(sc > 0);
                     if (sc <= l * dFrag_Score_Cutoff) // hit
                     {
                         std::string fragment;
-                        int nFragLen = 0;
+                        //   int nFragLen = 0;
                         for (int j = i; j < i + l; ++j) {
                             if (seq1[j] == '-') // skip gaps on seq1
                                 continue;
                             fragment += seq2[j];
-                            nFragLen++;
+                            //      nFragLen++;
                         }
-                        _matFragments[pos][pos + nFragLen - 1].push_back(fragment);
+                        assert(fragment.length() > 0);
+                        assert(pos < _refProtein.length() && pos + fragment.length() - 1 < _refProtein.length());
+                        _matFragments[pos][pos + fragment.length() - 1].push_back(fragment);
                     }
                 }
                 if (seq1[i] != '-')
                     pos++;
             }
+            assert(pos == _refProtein.length());
+
         }
     }
 
@@ -346,7 +352,7 @@ void ProteinProfile::Calculate_Pot_AAFreq_Profile() {
 void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
     assert(utility::DirectoryExists(sDirectory));
 
-    {
+    if (_vecHomologous_Proteins.size()) {
         std::ofstream outFile(sDirectory + RelativeFileName("family"));
         outFile << QuickInfo(true) << "\n\n" << "#PROTEIN_FAMILY\n\n"
                 << sFileStartSym << "\n";
@@ -454,8 +460,11 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
     std::string HEAD;
     double PARAM;
 
-    {
-        std::ifstream inFile(sDirectory + RelativeFileName("family"));
+
+    std::string fFamily = sDirectory + RelativeFileName("family");
+    if (utility::FileExists(fFamily)) {
+        std::ifstream inFile(fFamily);
+
         while (HEAD != sFileStartSym)
             inFile >> HEAD;
         while (std::getline(inFile, HEAD))

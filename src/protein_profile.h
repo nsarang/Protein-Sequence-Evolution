@@ -41,7 +41,8 @@ public:
 
 	void CalculateRemainingProfiles(bool bVerbose = true);
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
-	                              double dAlgn_Score_CutOff, double bVerbose = false);
+	                              double bVerbose = false,
+	                              double dAlgn_Score_CutOff = ALIGN_SC_CUTTOFF);
 
 	void Read_FromFile(std::string sDirectory = db_Profiles);
 	void Write_ToFile(bool bWriteCounts = false, std::string sDirectory = db_Profiles);
@@ -78,6 +79,7 @@ private:
 	double _dAlgn_Score_CutOff, _dFrag_Score_Cutoff, _dGap_Penalty; // Alignment parameters
 	int _nMin_Frag;
 	double _dPotS_Param; // Pot parameter
+	
 	bool bAlgn_Rdy{ false }, bFrags_Rdy{ false }, bSolvent_Rdy{ false }, bSS_Rdy{ false }, bPot_Rdy { false };
 
 	std::vector<Protein> _vecHomologous_Proteins; // Protein with homologous structures extracted from CATH
