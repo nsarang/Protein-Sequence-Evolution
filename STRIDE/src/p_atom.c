@@ -13,8 +13,8 @@ int Process_ATOM(BUFFER Buffer, CHAIN **Chain, int *ChainNumber,
   if( Cmd->NActive && !ChInStr(Cmd->Active,SpaceToDash(Buffer[21])) )
      return(SUCCESS);
 
-  if( Buffer[16] != 'A' && Buffer[16] != ' ' && Buffer[16] != '1' ) 
-    return(SUCCESS);
+//  if( Buffer[16] != 'A' && Buffer[16] != ' ' && Buffer[16] != '1' ) 
+//    return(SUCCESS);
 
   if( *First_ATOM ) {
     for( CC=0; CC<MAX_CHAIN; CC++ ) 
