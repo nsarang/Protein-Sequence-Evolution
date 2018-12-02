@@ -16,9 +16,9 @@ using namespace std;
 
 
 int main(int argc, const char * argv[]) {
-	assert(argc > 1);
-	std::string target_path = argv[1];
-	auto target = Protein(target_path, 1 + 2 + 4 + 8);
+	// assert(argc > 1);
+	// std::string target_path = argv[1];
+	//auto target = Protein(target_path, 1 + 2 + 4 + 8);
 
 	auto vecDB = utility::CATH_ListFiles(db_CATH);
 	
