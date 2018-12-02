@@ -1,5 +1,7 @@
 #include "protein.h"
 
+namespace sp = subprocess;
+
 
 
 Protein::Protein(std::string fPath, int nFlag, double dPotS_Param)
@@ -23,16 +25,17 @@ Protein::Protein(std::string fPath, int nFlag, double dPotS_Param)
 void Protein::Parse_PDB(std::string fPath, std::vector<AminoAcid> &retVec) {
     retVec.clear();
     std::ifstream inFile(fPath);
-    std::string line;
+    std::string line, last, current;
 
     while (getline(inFile, line)) {
         if (line.size() < 47 || line.substr(0, 4) != "ATOM")
             continue;
 
         std::string atom_name = utility::trim(line.substr(12, 4));
-        if (atom_name != "CA" || !(line[16] == 'A' || line[16] == ' ' || line[16] == '1'))
+        if (atom_name != "CA" || (last == line.substr(22, 5)) )
             continue;
 
+        last = line.substr(22, 5);
         retVec.emplace_back(AminoAcid(
                                 resName_to_sym.count(line.substr(17, 3)) ?  line.substr(17, 3) : "UNK",
                                 ' ',
@@ -118,7 +121,7 @@ void Protein::Calculate_SS(bool bForceCalc) {
     aSecondary_Structure.resize( length() );
     std::string stdout, line, prev_line;
 
-    auto oBuffer = subprocess::check_output({ex_STRIDE.c_str(), "-o", fPath.c_str()});
+    auto oBuffer = subprocess::check_output({ex_STRIDE.c_str(), "-o", fPath.c_str()}, sp::error{sp::PIPE});
     std::stringstream ret(oBuffer.buf.data());
 
     int pos = 0;
@@ -127,7 +130,7 @@ void Protein::Calculate_SS(bool bForceCalc) {
             for (int i = 10; i < 60; ++i) {
                 assert(isalpha(line[i]) || isspace(line[i]));
 
-                if (isspace(prev_line[i]) || prev_line[i] == 'X')
+                if (isspace(prev_line[i]))
                     continue;
                 if (isspace(line[i]))
                     line[i] = 'C';
@@ -139,10 +142,11 @@ void Protein::Calculate_SS(bool bForceCalc) {
             }
         }
         if (line.substr(0, 3) == "LOC")
-            return;
+            break;
 
         prev_line = line;
     }
+    assert(pos == length());
     bSS_Rdy = true;
 }
 
