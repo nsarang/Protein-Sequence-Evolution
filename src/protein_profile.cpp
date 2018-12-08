@@ -2,8 +2,15 @@
 using namespace std::placeholders;
 
 
-ProteinProfile::ProteinProfile(Protein target)
-    : _refProtein ( target )
+ProteinProfile::ProteinProfile(Protein target,
+                               double dAlgn_SCut,
+                               double dFrag_SCut,
+                               double dGap_Penalty,
+                               double dPotS_Param,
+                               int nMin_Frag)
+    : _refProtein ( target ), _dAlgn_Score_CutOff( dAlgn_SCut ),
+      _dFrag_Score_Cutoff ( dFrag_SCut ), _dGap_Penalty( dGap_Penalty ),
+      _dPotS_Param( dPotS_Param ), _nMin_Frag ( nMin_Frag )
 {
     _aAlgn_Profile.resize(_refProtein.length());
     _aAlgn_Position_Count.resize(_refProtein.length());
@@ -13,14 +20,24 @@ ProteinProfile::ProteinProfile(Protein target)
 
 
 
+void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB, double bVerbose)
+{
+    _vecHomologous_Proteins.clear();
+    _vecTupleAlignments.clear();
+
+    std::vector<std::function<void(std::string&)> > vecProcs;
+    vecProcs.push_back(std::bind(&ProteinProfile::Process_IsHomologue, this, _1));
+    Thread_Manager(vecProcs, vecDB, bVerbose, "Searching for proteins homologous to the target structure");
+}
+
+
+
 void ProteinProfile::CalculateProfiles(int nFlag,
                                        bool bVerbose,
-                                       bool bSave_Frags,
-                                       double dFrag_Score_Cutoff,
-                                       double dGap_Penalty,
-                                       double dPotS_Param,
-                                       int nMin_Frag)
+                                       bool bSave_Frags)
 {
+    if (nFlag == 0)
+        return;
     if (_vecHomologous_Proteins.empty()) {
         std::cerr << "FatalError: No protein to process.";
         return;
@@ -44,12 +61,12 @@ void ProteinProfile::CalculateProfiles(int nFlag,
     if (nFlag & 4) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_Pot_AAFreq, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_Pot_AAFreq_Profile, this));
-        _dPotS_Param = dPotS_Param;
         Msg += "Pot, ";
     }
     if (nFlag & 8) {
-        vecCalcFuncs.push_back([ = ] { Calculate_Alignment_Profile(bSave_Frags, dFrag_Score_Cutoff,
-                                       dGap_Penalty, nMin_Frag);
+        vecCalcFuncs.push_back([ = ] { Calculate_Alignment_Profile(bSave_Frags,
+                                       _dFrag_Score_Cutoff,
+                                       _dGap_Penalty, _nMin_Frag);
                                      });
         Msg += "Algn, ";
     }
@@ -64,29 +81,18 @@ void ProteinProfile::CalculateProfiles(int nFlag,
 
 
 
-void ProteinProfile::CalculateRemainingProfiles(bool bVerbose) {
+void ProteinProfile::CalculateRemainingProfiles(std::vector<std::string> vecDB, bool bVerbose) {
     int nFlag = 0;
     bool abFlags[] = {bSolvent_Rdy, bSS_Rdy, bPot_Rdy, bAlgn_Rdy};
     for (int i = 0, j = 1; i < 4; ++i, j *= 2)
-        if (abFlags[i])
+        if (abFlags[i] == false)
             nFlag += j;
-    CalculateProfiles(nFlag, bVerbose);
-}
-
-
-
-void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB,
-        double bVerbose,
-        double dAlgn_Score_CutOff)
-{
-    _vecHomologous_Proteins.clear();
-    _vecTupleAlignments.clear();
-
-    _dAlgn_Score_CutOff = dAlgn_Score_CutOff;
-
-    std::vector<std::function<void(std::string&)> > vecProcs;
-    vecProcs.push_back(std::bind(&ProteinProfile::Process_IsHomologue, this, _1));
-    Thread_Manager(vecProcs, vecDB, bVerbose, "Searching for proteins homologous to the target structure");
+    if (nFlag) {
+        if (_vecHomologous_Proteins.empty()) {
+            Find_Homologous_Proteins(vecDB, bVerbose);
+        }
+        CalculateProfiles(nFlag, bVerbose);
+    }
 }
 
 
@@ -469,7 +475,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
             inFile >> HEAD;
         while (std::getline(inFile, HEAD))
             if (HEAD != "")
-                _vecHomologous_Proteins.emplace_back(Protein(HEAD));
+                Process_IsHomologue(HEAD);
     }
 
     std::string fSolvName = sDirectory + RelativeFileName("solvent");
