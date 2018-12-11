@@ -31,7 +31,7 @@ class ProteinProfile {
 
 public:
 	ProteinProfile(Protein target,
-				   double dAlgn_Score_CutOff = ALIGN_SC_CUTTOFF,
+	               double dAlgn_Score_CutOff = ALIGN_SC_CUTTOFF,
 	               double dFrag_Score_Cutoff = DIST_CUTOFF,
 	               double dGap_Penalty = GAP_PENALTY,
 	               double dPotS_Param = Pot_S_Constant,
@@ -44,7 +44,7 @@ public:
 	                       bool bVerbose = false,
 	                       bool bSave_Frags = true);
 
-	void CalculateRemainingProfiles(std::vector<std::string> vecDB,
+	bool CalculateRemainingProfiles(std::vector<std::string> vecDB,
 	                                bool bVerbose = false);
 
 	void Read_FromFile(std::string sDirectory = db_Profiles);

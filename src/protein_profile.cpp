@@ -81,7 +81,7 @@ void ProteinProfile::CalculateProfiles(int nFlag,
 
 
 
-void ProteinProfile::CalculateRemainingProfiles(std::vector<std::string> vecDB, bool bVerbose) {
+bool ProteinProfile::CalculateRemainingProfiles(std::vector<std::string> vecDB, bool bVerbose) {
     int nFlag = 0;
     bool abFlags[] = {bSolvent_Rdy, bSS_Rdy, bPot_Rdy, bAlgn_Rdy};
     for (int i = 0, j = 1; i < 4; ++i, j *= 2)
@@ -92,7 +92,9 @@ void ProteinProfile::CalculateRemainingProfiles(std::vector<std::string> vecDB, 
             Find_Homologous_Proteins(vecDB, bVerbose);
         }
         CalculateProfiles(nFlag, bVerbose);
+        return true;
     }
+    return false;
 }
 
 
