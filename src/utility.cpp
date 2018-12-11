@@ -7,16 +7,25 @@ namespace utility {
 
 
 std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
-    std::vector<std::string> vecProcessedDB;
+    std::vector<std::string> vecProcessedDB, vecBL;
     DIR *hDir;
     dirent *hFile;
     assert(hDir = opendir(sDB_Path.c_str()));
     int total = CountFilesInDir(sDB_Path);
-
     vecProcessedDB.reserve(total);
+
+
+    if (FileExists(fl_CATH_BL)) {
+        std::ifstream blFile(fl_CATH_BL);
+        std::string sName;
+        while (blFile >> sName)
+            vecBL.push_back(sName);
+    }
+
     while ((hFile = readdir(hDir))) {
         std::string fName = hFile->d_name;
-        if (fName.size() != 7 || !isdigit(fName[0]))
+        if (fName.size() != 7 || !isdigit(fName[0]) ||
+                std::binary_search(vecBL.begin(), vecBL.end(), fName))
             continue;
 
         vecProcessedDB.push_back(sDB_Path + fName);
@@ -141,8 +150,8 @@ std::string File_md5(std::string fName) {
 int CountFilesInDir(std::string fDir) {
     auto ls = sp::Popen({"ls", fDir.c_str()}, sp::output{sp::PIPE});
     auto wc = sp::Popen({"wc", "-l"},
-                                sp::input{ls.output()},
-                                sp::output{sp::PIPE});
+                        sp::input{ls.output()},
+                        sp::output{sp::PIPE});
     auto res = wc.communicate().first;
     return std::stoi(res.buf.data());
 }

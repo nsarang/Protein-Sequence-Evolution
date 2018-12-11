@@ -17,6 +17,7 @@
 #include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "constants.h"
 #include "cpplocate.hpp"
 #include "mapping.h"
 #include "subprocess.hpp"
