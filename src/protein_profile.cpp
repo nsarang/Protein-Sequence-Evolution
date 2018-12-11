@@ -366,6 +366,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
             outFile << P.fPath << "\n";
     }
 
+
     if (bSolvent_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("solvent"));
 
@@ -380,6 +381,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
         }
     }
 
+
     if (bSS_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("sec"));
 
@@ -393,6 +395,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
             outFile << "\n";
         }
     }
+
 
     if (bPot_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("pot"));
@@ -410,6 +413,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
                     << _aAA_Freq_Mean[i] << " " << _aAA_Freq_Stdev[i] << "\n";
 
     }
+
 
     if (bAlgn_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("alignment"));
@@ -467,17 +471,6 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
     double PARAM;
 
 
-    std::string fFamily = sDirectory + RelativeFileName("family");
-    if (utility::FileExists(fFamily)) {
-        std::ifstream inFile(fFamily);
-
-        while (HEAD != sFileStartSym)
-            inFile >> HEAD;
-        while (std::getline(inFile, HEAD))
-            if (HEAD != "")
-                Process_IsHomologue(HEAD);
-    }
-
     std::string fSolvName = sDirectory + RelativeFileName("solvent");
     if (utility::FileExists(fSolvName)) {
         std::ifstream inFile(fSolvName);
@@ -495,6 +488,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
         bSolvent_Rdy = true;
     }
 
+
     std::string fSecName = sDirectory + RelativeFileName("sec");
     if (utility::FileExists(fSolvName)) {
         std::ifstream inFile(fSecName);
@@ -511,6 +505,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
 
         bSS_Rdy = true;
     }
+
 
     std::string fPotName = sDirectory + RelativeFileName("pot");
     if (utility::FileExists(fPotName)) {
@@ -536,6 +531,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
 
         bPot_Rdy = true;
     }
+
 
     std::string fAlgnName = sDirectory + RelativeFileName("alignment");
     if (utility::FileExists(fAlgnName)) {
@@ -581,6 +577,21 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
 
             bFrags_Rdy = true;
         }
+    }
+
+
+    std::string fFamily = sDirectory + RelativeFileName("family");
+    if (utility::FileExists(fFamily)) {
+        std::ifstream inFile(fFamily);
+
+        while (HEAD != sFileStartSym)
+            inFile >> HEAD;
+
+        std::vector<std::string> vecFamily;
+        while (std::getline(inFile, HEAD))
+            if (HEAD != "")
+                vecFamily.push_back(HEAD);
+        Find_Homologous_Proteins(vecFamily);
     }
 }
 
