@@ -35,9 +35,7 @@ std::vector<std::string> CATH_ListFiles(std::string sDB_Path) {
 
 
 void Progress_Indicator(std::string text, long long current, long long total) {
-    if (current == 0)
-        std::cout << "|\n";
-    std::cout << "\r\033[F" << text << ": ";
+    std::cout << (current ? "\r\033[F" : "") << text << ": ";
     int percent = current * 100 / total;
     if (percent == 100)
         std::cout << BOLDGREEN << "OK " << RESET << std::endl;
