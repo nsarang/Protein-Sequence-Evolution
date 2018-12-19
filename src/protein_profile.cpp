@@ -539,6 +539,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
     if (utility::FileExists(fAlgnName)) {
         std::ifstream inFile(fAlgnName);
 
+        HEAD = "";
         while (HEAD != sFileStartSym) {
             if (HEAD.find("ALGN_SCORE_CUTOFF") == 0) {
                 inFile >> PARAM;
@@ -571,6 +572,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
         if (utility::FileExists(fFragName)) {
             std::ifstream inFile(fFragName);
 
+            HEAD = "";
             while (HEAD != sFileStartSym)
                 inFile >> HEAD;
 
@@ -586,6 +588,7 @@ void ProteinProfile::Read_FromFile(std::string sDirectory) {
     if (utility::FileExists(fFamily)) {
         std::ifstream inFile(fFamily);
 
+        HEAD = "";
         while (HEAD != sFileStartSym)
             inFile >> HEAD;
 
