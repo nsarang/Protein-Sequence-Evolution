@@ -6,3 +6,5 @@ _Tests/
 src/.depend
 Profiles/*
 NewProtEvol
+TMalign/*
+STRIDE/*
