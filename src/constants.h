@@ -7,8 +7,8 @@
 // PATHS
 const std::string db_CATH = "./CATH/";
 const std::string db_Profiles = "./Profiles/";
+const std::string db_DFIRE2 = "./Config/dDFIRE.lib";
 const std::string fl_CATH_BL = "./Config/cath_blacklist.txt";
-//const std::string db_Align = "./Alignments/";
 const std::string ex_STRIDE = "./STRIDE/stride";
 const std::string ex_TMALIGN = "./TMalign/TMalign";
 const std::string sFileStartSym = "~^&%@";
