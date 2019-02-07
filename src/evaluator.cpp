@@ -32,7 +32,7 @@ double Evaluator::O_Fitna(Protein &target, ProteinProfile& profiles, DFIRE2& dDF
     score[1] = Secondary_Struct(target, profiles._aSec_Profile);
     score[2] = AlignmentScore(target, profiles._aAlgn_Profile);
     score[3] = dDFIRE_Inst.Calc_CFE(target) / (target.length() * dDFIRE_COEF);
-    score[4] = PotScore(target, profiles._aPot_Bar, profiles._aPot_Stdev, profiles._dPotS_Param);
+ //   score[4] = PotScore(target, profiles._aPot_Bar, profiles._aPot_Stdev, profiles._dPotS_Param);
     auto ret = FrequencyScore(target, profiles._aAA_Freq_Mean, profiles._aAA_Freq_Stdev);
     std::copy(ret.begin(), ret.end(), score.begin() + 5);
 
@@ -43,26 +43,23 @@ double Evaluator::O_Fitna(Protein &target, ProteinProfile& profiles, DFIRE2& dDF
 }
 
 
-double Evaluator::PotScore(Protein& target,
-                           std::array<double, 20>& aPot_Bar,
-                           std::array<double, 20>& aPot_Stdev,
-                           double dPotS_Param)
+std::array<double, 20> Evaluator::PotScore(Protein& target,
+        std::array<double, 20>& aPot_Bar,
+        std::array<double, 20>& aPot_Stdev,
+        double dPotS_Param)
 {
     target.Calculate_Pot(dPotS_Param);
+    std::array<double, 20> retPot_scores{};
 
-    double avg = 0;
-    int n = target.length(),
-        excluded = 0;
+
+    int n = target.length();
     for (int i = 0; i < 20; ++i) {
-        int nFreq = target.aAA_Freqs[i] * n;
-        if (nFreq < 2) {
-            excluded += nFreq;
+        if (target.aAA_Freqs[i] * n < 2)
             continue;
-        }
-        avg += nFreq * ( 0.5 * std::pow((target.aPot_Values[i] - aPot_Bar[i]) / aPot_Stdev[i], 2)
-                         - log(1 / (aPot_Stdev[i] * std::sqrt(2 * M_PI))) );
+        retPot_scores[i] = 0.5 * std::pow((target.aPot_Values[i] - aPot_Bar[i]) / aPot_Stdev[i], 2)
+                           - log(1 / (aPot_Stdev[i] * std::sqrt(2 * M_PI)));
     }
-    return avg / (n - excluded);
+    return retPot_scores;
 }
 
 

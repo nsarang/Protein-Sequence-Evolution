@@ -18,22 +18,24 @@ public:
 	Evaluator(std::vector<std::vector<double> > vWeights);
 
 	double O_Fitna(Protein &target, ProteinProfile& profiles, DFIRE2& dDFIRE_Inst);
-	double PotScore(Protein& target,
-	                std::array<double, 20>& aPot_Bar,
-	                std::array<double, 20>& aPot_Stdev,
-	                double dPotS_Param);
+	
+	static std::array<double, 20> PotScore(Protein& target,
+	                                       std::array<double, 20>& aPot_Bar,
+	                                       std::array<double, 20>& aPot_Stdev,
+	                                       double dPotS_Param);
 
-	double Solvent_Score(Protein& target,
-	                     std::array<std::array<double, 7>, 20>& aProfile);
+	static double Solvent_Score(Protein& target,
+	                            std::array<std::array<double, 7>, 20>& aProfile);
 
-	double Secondary_Struct(Protein& target,
-	                        std::array<std::array<double, 7>, 20>& aProfile);
+	static double Secondary_Struct(Protein& target,
+	                               std::array<std::array<double, 7>, 20>& aProfile);
 
-	double AlignmentScore(Protein& target, std::vector<std::array<double, 7> >& aProfile);
+	static double AlignmentScore(Protein& target,
+	                             std::vector<std::array<double, 7> >& aProfile);
 
-	std::array<double, 20> FrequencyScore(Protein& target,
-	                                      std::array<double, 20>& aAA_Freq_Mean,
-	                                      std::array<double, 20>& aAA_Freq_Stdev);
+	static std::array<double, 20> FrequencyScore(Protein& target,
+	        std::array<double, 20>& aAA_Freq_Mean,
+	        std::array<double, 20>& aAA_Freq_Stdev);
 
 	static double eNormalaize(double e, double lB, double uB);
 	double operator()(Protein &target, ProteinProfile& profiles, DFIRE2& dDFIRE_Inst);
