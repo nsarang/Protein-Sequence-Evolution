@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <algorithm>
 #include <random>
@@ -9,9 +8,7 @@
 #include "protein.h"
 #include "protein_profile.h"
 #include "evaluator.h"
-#include "subprocess.hpp"
-
-using namespace std;
+#include "deep.h"
 
 
 
@@ -19,7 +16,11 @@ int main(int argc, const char * argv[]) {
 	// assert(argc > 1);
 	// std::string target_path = argv[1];
 	// auto target = Protein(target_path, 1 + 2 + 4 + 8);
+	
 	auto vecDB = utility::CATH_ListFiles(db_CATH);
+	DeepAI DI;
+	auto vecProfiles = DI.PrepareProfiles("./FamilyProfiles/");
+	DI.GenerateDataset(vecProfiles, "dataset.csv", 10);
 
 	/*
 	decltype(vecDB) vecSample;
@@ -28,6 +29,7 @@ int main(int argc, const char * argv[]) {
 	            1000, std::mt19937{std::random_device{}()});
 	*/
 
+	/*
 	for (auto fPath : vecDB) {
 		std::cerr << fPath << "\n";
 		auto prot = Protein(fPath);
@@ -37,4 +39,5 @@ int main(int argc, const char * argv[]) {
 		if (profile.CalculateRemainingProfiles(vecDB, true))
 			profile.Write_ToFile();
 	}
+	*/
 }
