@@ -5,8 +5,10 @@ namespace sp = subprocess;
 
 
 Protein::Protein(std::string fPath, int nFlag, double dPotS_Param)
-    : fPath( fPath ), md5( utility::File_md5(fPath) )
+    : fPath( fPath )
 {
+    assert(utility::FileExists(fPath));
+    md5 = utility::File_md5(fPath);
     Parse_PDB(fPath, vecAmino_Acid);
     for (auto& amino_acid : vecAmino_Acid)
         sequence += amino_acid.symbol;
