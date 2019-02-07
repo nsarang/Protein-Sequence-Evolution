@@ -16,6 +16,7 @@
 #include <sstream>
 #include <functional>
 #include <unistd.h>
+#include <optional>
 #include <tuple>
 #include "mapping.h"
 #include "utility.h"
@@ -28,6 +29,7 @@
 
 class ProteinProfile {
 	friend class Evaluator;
+	friend class DeepAI;
 
 public:
 	ProteinProfile(Protein target,
@@ -44,7 +46,7 @@ public:
 	                       bool bVerbose = false,
 	                       bool bSave_Frags = true);
 
-	bool CalculateRemainingProfiles(std::vector<std::string> vecDB,
+	bool CalculateRemainingProfiles(std::optional<std::vector<std::string>> vecDB,
 	                                bool bVerbose = false);
 
 	void Read_FromFile(std::string sDirectory = db_Profiles);
@@ -100,7 +102,7 @@ private:
 	std::array<long long, 20> _aAA_Total_Count{ };
 	std::vector<long long> _aAlgn_Position_Count{ };
 	std::array<long long, 7> _aAlgn_Class_Count{ };
-	std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot, _mtx_algn; // Mutexs used in threads
+	inline static std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot, _mtx_algn; // Mutexs used in threads
 };
 
 
