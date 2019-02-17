@@ -15,6 +15,7 @@
 #include <dirent.h>
 #include <cerrno>
 #include <cstring>
+#include <mutex>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "constants.h"
@@ -30,6 +31,18 @@ const char BOLDRED[] = "\033[1m\033[31m";
 const char BOLDGREEN[] = "\033[1m\033[32m";
 const int BUFFERSIZE = 1024;
 
+
+
+template<class FuncType, class vecType>
+void Thread_Manager(std::vector<std::function<FuncType> > vecFunctions,
+	                std::vector<vecType>& vecDatabase,
+	                bool bVerbose = false, std::string sMsg = "",
+	                int nThreads = std::thread::hardware_concurrency());
+
+
+template<class FuncType, class vecType>
+void Processing_Thread(std::vector<std::function<FuncType> > vecFunctions,
+	                   std::vector<vecType> vecBatch, int& nCount_Now);
 
 
 std::vector<std::string> CATH_ListFiles(std::string path);
@@ -62,5 +75,6 @@ long double UniformRand(int lb, int ub);
 } // namespace
 
 
+#include "utility.tpp"
 
 #endif // __UTILITY_H__
