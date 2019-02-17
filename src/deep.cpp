@@ -20,11 +20,15 @@ std::vector<ProteinProfile> DeepAI::PrepareProfiles(std::string sFDir)
 		auto prot = Protein(HEAD);
 		auto profile = ProteinProfile(prot);
 
-		std::cerr << HEAD << " " << prot.md5 << "\n";
-		profile.Read_FromFile(sFDir);
-		if (profile.CalculateRemainingProfiles(std::nullopt))
-			profile.Write_ToFile();
+		profile.Read_FromFile(db_Profiles, 1 + 2 + 4 + 8);
+		if (profile.RemainingProfiles() != 0)
+		{
+			profile.Read_FromFile(sFDir, 32);
+			profile.CalculateProfiles( profile.RemainingProfiles() );
+			profile.Write_ToFile(db_Profiles, 1 + 2 + 4 + 8 + 32);
+		}
 
+		std::cerr << HEAD << " " << prot.md5 << "\n";
 		retProfiles.push_back(profile);
 	}
 
@@ -58,7 +62,8 @@ void DeepAI::GenerateDataset(std::vector<ProteinProfile>& vecProfiles,
 		int nToGen = std::min((int)vecProtEq.size(), maxPerProt) - 1;
 		auto bound = std::partition (vecProtEq.begin(),
 		                             vecProtEq.end(),
-		[&](Protein & p) { return mpUsedCount[ p.md5 ] < 10; });
+		[&](Protein & p) { return mpUsedCount[ p.md5 ] < 10; }
+		                            );
 
 		decltype(vecProtEq) vecSample;
 		std::sample(vecProtEq.begin(), bound,
@@ -68,7 +73,7 @@ void DeepAI::GenerateDataset(std::vector<ProteinProfile>& vecProfiles,
 		for (int i = 0; i < nToGen; ++i)
 		{
 			if (vecSample[i].md5 == profile._refProtein.md5) {
-				i--;
+				nToGen++;
 				continue;
 			}
 			GenerateScores(profile, vecSample[i], outFile);
@@ -86,11 +91,10 @@ void DeepAI::GenerateScores(ProteinProfile& profile, Protein& prot,
 	static DFIRE2 dDFIRE_Inst(db_DFIRE2);
 	outFile << utility::FileBasename(profile._refProtein.fPath) << '-'
 	        << utility::FileBasename(prot.fPath) << '-'
-	        << prot.length();
+	        << prot.length() << sep;
 
 	outFile << Evaluator::Solvent_Score(prot, profile._aSolvent_Profile) << sep
 	        << Evaluator::Secondary_Struct(prot, profile._aSec_Profile) << sep
-	        << Evaluator::AlignmentScore(prot, profile._aAlgn_Profile) << sep
 	        << Evaluator::AlignmentScore(prot, profile._aAlgn_Profile) << sep
 	        << dDFIRE_Inst.Calc_CFE(prot) / prot.length() << sep;
 

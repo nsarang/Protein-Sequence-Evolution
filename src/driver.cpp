@@ -9,18 +9,29 @@
 #include "protein_profile.h"
 #include "evaluator.h"
 #include "deep.h"
-
+using namespace std;
 
 
 int main(int argc, const char * argv[]) {
 	// assert(argc > 1);
 	// std::string target_path = argv[1];
 	// auto target = Protein(target_path, 1 + 2 + 4 + 8);
-	
+
+
 	auto vecDB = utility::CATH_ListFiles(db_CATH);
 	DeepAI DI;
 	auto vecProfiles = DI.PrepareProfiles("./FamilyProfiles/");
 	DI.GenerateDataset(vecProfiles, "dataset.csv", 10);
+
+/*
+	std::string fPath1 = "./CATH/2nvnA00", fPath2 = "./CATH/1dznA01";
+	auto prot = Protein(fPath1);
+	auto profile = ProteinProfile(prot);
+	profile.Read_FromFile();
+	auto prot2 = Protein(fPath2, 1 + 2 + 4 + 8);
+	std::ofstream o("ole.txt");
+	DI.GenerateScores(profile, prot2, o);
+	*/
 
 	/*
 	decltype(vecDB) vecSample;
