@@ -28,7 +28,7 @@ std::vector<ProteinProfile> DeepAI::PrepareProfiles(std::string sFDir)
 			profile.Write_ToFile(db_Profiles, 1 + 2 + 4 + 8 + 32);
 		}
 
-		std::cerr << HEAD << " " << prot.md5 << "\n";
+		std::cerr << "Read\t" << HEAD << " " << prot.md5 << "\n";
 		retProfiles.push_back(profile);
 	}
 
@@ -46,12 +46,15 @@ void DeepAI::GenerateDataset(std::vector<ProteinProfile>& vecProfiles,
 	std::map<int, std::vector<Protein>> mpProtEqLen;
 	std::map<std::string, int> mpUsedCount;
 
+	// prepare maps
 	for (auto& fPath : vecDB)
 	{
 		auto prot = Protein(fPath);
 		mpProtEqLen[ prot.length() ].push_back(prot);
 		mpUsedCount[ prot.md5 ] = 0;
 	}
+
+	// select candidates for a  ProteinProfile
 	for (auto& profile : vecProfiles)
 	{
 		int len = profile._refProtein.length();
@@ -62,7 +65,7 @@ void DeepAI::GenerateDataset(std::vector<ProteinProfile>& vecProfiles,
 		int nToGen = std::min((int)vecProtEq.size(), maxPerProt) - 1;
 		auto bound = std::partition (vecProtEq.begin(),
 		                             vecProtEq.end(),
-		[&](Protein & p) { return mpUsedCount[ p.md5 ] < 10; }
+									 [&](Protein & p) { return mpUsedCount[ p.md5 ] < 10; } // comparator lambda function
 		                            );
 
 		decltype(vecProtEq) vecSample;

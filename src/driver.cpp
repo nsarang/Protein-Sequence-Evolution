@@ -23,6 +23,7 @@ int main(int argc, const char * argv[]) {
 	auto vecProfiles = DI.PrepareProfiles("./FamilyProfiles/");
 	DI.GenerateDataset(vecProfiles, "dataset.csv", 10);
 
+
 /*
 	std::string fPath1 = "./CATH/2nvnA00", fPath2 = "./CATH/1dznA01";
 	auto prot = Protein(fPath1);
