@@ -38,9 +38,10 @@ class Protein {
 	friend class DeepAI;
 
 public:
-	Protein(std::string fPath, int nFlag = 0, double dPotS_Param = Pot_S_Constant);
+	Protein(std::string fPath, int nFlag = 0, double dPotS_Param = Pot_S_Constant,
+	        bool calcMD5 = true);
 	static void Parse_PDB(std::string fPath, std::vector<AminoAcid>& retVec);
-	
+
 	double CA_Atom_Distance(int i, int j);
 	std::string Get_Sequence();
 	int length();
@@ -65,7 +66,7 @@ private:
 	std::vector<AminoAcid> vecAmino_Acid;
 	std::vector<std::vector<double > > vecAtom_Distance;
 	std::vector<int> aSolvent_Accessibility, aSecondary_Structure;
-	std::array<double, 20> aPot_Values{ }, aAA_Freqs{ }; 
+	std::array<double, 20> aPot_Values{ }, aAA_Freqs{ };
 };
 
 
