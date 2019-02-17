@@ -20,27 +20,26 @@ ProteinProfile::ProteinProfile(Protein target,
 
 
 
-void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB, double bVerbose)
+void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB,
+        double bVerbose)
 {
     _vecHomologous_Proteins.clear();
     _vecTupleAlignments.clear();
 
     std::vector<std::function<void(std::string&)> > vecProcs;
     vecProcs.push_back(std::bind(&ProteinProfile::Process_IsHomologue, this, _1));
-    Thread_Manager(vecProcs, vecDB, bVerbose, "Searching for proteins homologous to the target structure");
+    utility::Thread_Manager(vecProcs, vecDB, bVerbose,
+                            "Searching for proteins homologous to the target structure");
 }
 
 
 
-void ProteinProfile::CalculateProfiles(int nFlag,
-                                       bool bVerbose,
-                                       bool bSave_Frags)
-{
+bool ProteinProfile::CalculateProfiles(int nFlag, bool bVerbose) {
     if (nFlag == 0)
-        return;
+        return false;
     if (_vecHomologous_Proteins.empty()) {
         std::cerr << "FatalError: No protein to process.";
-        return;
+        return false;
     }
 
     std::vector<std::function<void(Protein&)> > vecProcFuncs;
@@ -48,103 +47,70 @@ void ProteinProfile::CalculateProfiles(int nFlag,
     std::string Msg = "Calculating ";
 
 
-    if (nFlag & 1) {
+    if (nFlag & SolID) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_Solvent, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_Solvent_Profile, this));
+
+        _aSolvent_AA_Count.fill({});
+        _aAA_Total_Count.fill({});
+        _aSolvent_Profile.fill({});
+
         Msg += "Solvent, ";
     }
-    if (nFlag & 2) {
+    if (nFlag & SecID) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_SS, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_SS_Profile, this));
+
+        _aSec_AA_Count.fill({});
+        _aSec_Profile.fill({});
+
         Msg += "SS, ";
     }
-    if (nFlag & 4) {
+    if (nFlag & PotID) {
         vecProcFuncs.push_back(std::bind(&ProteinProfile::Process_Pot_AAFreq, this, _1));
         vecCalcFuncs.push_back(std::bind(&ProteinProfile::Calculate_Pot_AAFreq_Profile, this));
+
+        _vecPotScores.fill(std::vector<double> {});
+        _vecAA_Freqs.fill(std::vector<double> {});
+        _aPot_Bar.fill({}), _aPot_Stdev.fill({}), _aAA_Freq_Mean.fill({}), _aAA_Freq_Stdev.fill({});
+
         Msg += "Pot, ";
     }
-    if (nFlag & 8) {
-        vecCalcFuncs.push_back([ = ] { Calculate_Alignment_Profile(bSave_Frags,
+    if (nFlag & AlgnID) {
+        vecCalcFuncs.push_back([ = ] { Calculate_Alignment_Profile(nFlag & FragID,
                                        _dFrag_Score_Cutoff,
                                        _dGap_Penalty, _nMin_Frag);
                                      });
+
+        std::fill(_aAlgn_Position_Count.begin(), _aAlgn_Position_Count.end(), 0);
+        std::fill(_aAlgn_Profile.begin(), _aAlgn_Profile.end(),
+                  std::array<double, 7> {});
+        _aAlgn_Class_Count.fill({});
+        for (auto& T1 : _matFragments)
+            for (auto& T2 : T1)
+                T2.clear();
+
         Msg += "Algn, ";
     }
 
     Msg.erase(Msg.size() - 2);
     Msg += " profiles";
 
-    Thread_Manager(vecProcFuncs, _vecHomologous_Proteins, bVerbose, Msg);
+    utility::Thread_Manager(vecProcFuncs, _vecHomologous_Proteins, bVerbose, Msg);
     for (auto CalcFunction : vecCalcFuncs)
         CalcFunction();
+    return true;
 }
 
 
 
-bool ProteinProfile::CalculateRemainingProfiles(std::optional<std::vector<std::string>> optvecDB,
-                                                bool bVerbose) {
+int ProteinProfile::RemainingProfiles() {
     int nFlag = 0;
     bool abFlags[] = {bSolvent_Rdy, bSS_Rdy, bPot_Rdy, bAlgn_Rdy};
     for (int i = 0, j = 1; i < 4; ++i, j *= 2)
         if (abFlags[i] == false)
             nFlag += j;
-    if (nFlag) {
-        if (_vecHomologous_Proteins.empty()) {
-            if (optvecDB)
-                Find_Homologous_Proteins(*optvecDB, bVerbose);
-        }
-        CalculateProfiles(nFlag, bVerbose);
-        return true;
-    }
-    return false;
-}
-
-
-
-template<class FuncType, class Args>
-void ProteinProfile::Thread_Manager(std::vector<std::function<FuncType> > vecFuncs,
-                                    std::vector<Args>& vecDB, bool bVerbose,
-                                    std::string sMsg, int nThreads)
-{
-    std::vector<std::thread> vecThreads;
-    int size = vecDB.size(),
-        nCount_Now = 0;
-
-    nThreads = (nThreads > 0 ? nThreads : FALLBACK_THRD_NUM);
-
-    for (int i = 0; i < nThreads; ++i) {
-        std::vector vecBatch(vecDB.begin() + i * size / nThreads,
-                             vecDB.begin() + (i + 1) * (size) / nThreads);
-        vecThreads.push_back(std::thread([ =, &nCount_Now] { Processing_Thread(vecFuncs, vecBatch, nCount_Now); })); // BUG #1: must send by copy
-    }
-
-    if (bVerbose) {
-        utility::Progress_Indicator(sMsg, 0, size);
-        while (true) {
-            usleep(500 * 1000);
-            utility::Progress_Indicator(sMsg, nCount_Now, size);
-            if (nCount_Now == size)
-                break;
-        }
-    }
-
-    for (int i = 0; i < nThreads; ++i)
-        vecThreads[i].join();
-}
-
-
-
-template<class FuncType, class Args>
-void ProteinProfile::Processing_Thread(std::vector<std::function<FuncType> > vecFuncs,
-                                       std::vector<Args> vecBatch, int& nCount_Now)
-{
-    for (auto& data : vecBatch) {
-        for (auto ProcFunction : vecFuncs)
-            ProcFunction(data);
-
-        std::lock_guard<std::mutex> lock(_mtx_count);
-        nCount_Now++;
-    }
+    return nFlag;
 }
 
 
@@ -359,10 +325,10 @@ void ProteinProfile::Calculate_Pot_AAFreq_Profile() {
 
 
 
-void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
+void ProteinProfile::Write_ToFile(std::string sDirectory, int nFlag) {
     assert(utility::DirectoryExists(sDirectory));
 
-    if (_vecHomologous_Proteins.size()) {
+    if ((nFlag & FamID) && _vecHomologous_Proteins.size()) {
         std::ofstream outFile(sDirectory + RelativeFileName("family"));
         outFile << QuickInfo(true) << "\n\n" << "#PROTEIN_FAMILY\n\n"
                 << sFileStartSym << "\n";
@@ -371,7 +337,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
     }
 
 
-    if (bSolvent_Rdy) {
+    if ((nFlag & SolID) && bSolvent_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("solvent"));
 
         outFile << QuickInfo() << "\n\n" << "#SOLVENT_PROFILE\n\n"
@@ -386,7 +352,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
     }
 
 
-    if (bSS_Rdy) {
+    if ((nFlag & SecID) && bSS_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("sec"));
 
         outFile << QuickInfo() << "\n\n" << "#SECONDARY_STRUCTURE_PROFILE\n\n"
@@ -401,7 +367,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
     }
 
 
-    if (bPot_Rdy) {
+    if ((nFlag & PotID) && bPot_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("pot"));
 
         outFile << QuickInfo() << "\n\n" << "#POT_STATISTIC\n\n" << sFileStartSym << "\n";
@@ -419,7 +385,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
     }
 
 
-    if (bAlgn_Rdy) {
+    if ((nFlag & AlgnID) && bAlgn_Rdy) {
         std::ofstream outFile(sDirectory + RelativeFileName("alignment"));
         outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_PROFILE\n\n" << sFileStartSym << "\n";
 
@@ -430,7 +396,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
             outFile << "\n";
         }
 
-        if (bFrags_Rdy) {
+        if ((nFlag & FragID) && bFrags_Rdy) {
             std::ofstream outFile(sDirectory + RelativeFileName("fragment"));
             outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_FRAGMENTS\n\n" << sFileStartSym << "\n";
             for (int i = 0; i < _refProtein.length(); ++i)
@@ -441,7 +407,7 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
 
     }
 
-    if (bWriteCounts) {
+    if (nFlag & countID) {
         std::ofstream outFile(sDirectory + RelativeFileName("count"));
         outFile << "#BURIAL_COUNT\n\n";
         for (int i = 0; i < 20; ++i) {
@@ -469,136 +435,144 @@ void ProteinProfile::Write_ToFile(bool bWriteCounts, std::string sDirectory) {
 
 
 
-void ProteinProfile::Read_FromFile(std::string sDirectory) {
+void ProteinProfile::Read_FromFile(std::string sDirectory, int nFlag) {
     assert(utility::DirectoryExists(sDirectory));
     std::string HEAD;
     double PARAM;
 
 
-    std::string fSolvName = sDirectory + RelativeFileName("solvent");
-    if (utility::FileExists(fSolvName)) {
-        std::ifstream inFile(fSolvName);
-
-        HEAD = "";
-        while (HEAD != sFileStartSym)
-            inFile >> HEAD;
-
-        for (int i = 0; i < 20; ++i) {
-            inFile >> HEAD;
-            for (int j = 0; j < 7; ++j)
-                inFile >> _aSolvent_Profile[i][j];
-        }
-
-        bSolvent_Rdy = true;
-    }
-
-
-    std::string fSecName = sDirectory + RelativeFileName("sec");
-    if (utility::FileExists(fSolvName)) {
-        std::ifstream inFile(fSecName);
-
-        HEAD = "";
-        while (HEAD != sFileStartSym)
-            inFile >> HEAD;
-
-        for (int i = 0; i < 20; ++i) {
-            inFile >> HEAD;
-            for (int j = 0; j < 7; ++j)
-                inFile >> _aSec_Profile[i][j];
-        }
-
-        bSS_Rdy = true;
-    }
-
-
-    std::string fPotName = sDirectory + RelativeFileName("pot");
-    if (utility::FileExists(fPotName)) {
-        std::ifstream inFile(fPotName);
-
-        HEAD = "";
-        while (HEAD != sFileStartSym) {
-            if (HEAD.find("POT_S_PARAMETER") == 0) {
-                inFile >> PARAM;
-                _dPotS_Param = PARAM;
-            }
-            inFile >> HEAD;
-        }
-
-        for (int i = 0; i < 20; ++i)
-            inFile >> HEAD >> _aPot_Bar[i] >> _aPot_Stdev[i];
-
-
-        while (HEAD != sFileStartSym)
-            inFile >> HEAD;
-        for (int i = 0; i < 20; ++i)
-            inFile >> HEAD >> _aAA_Freq_Mean[i] >> _aAA_Freq_Stdev[i];
-
-        bPot_Rdy = true;
-    }
-
-
-    std::string fAlgnName = sDirectory + RelativeFileName("alignment");
-    if (utility::FileExists(fAlgnName)) {
-        std::ifstream inFile(fAlgnName);
-
-        HEAD = "";
-        while (HEAD != sFileStartSym) {
-            if (HEAD.find("ALGN_SCORE_CUTOFF") == 0) {
-                inFile >> PARAM;
-                _dAlgn_Score_CutOff = PARAM;
-            }
-            if (HEAD.find("FRAG_DIST_CUTOFF") == 0) {
-                inFile >> PARAM;
-                _dFrag_Score_Cutoff = PARAM;
-            }
-            if (HEAD.find("GAP_PENALTY") == 0) {
-                inFile >> PARAM;
-                _dGap_Penalty = PARAM;
-            }
-            if (HEAD.find("MIN_FRAG_LENGTH") == 0) {
-                inFile >> PARAM;
-                _nMin_Frag = PARAM;
-            }
-            inFile >> HEAD;
-        }
-
-        for (int i = 0; i < _refProtein.length(); ++i) {
-            inFile >> HEAD;
-            for (int j = 0; j < 7; ++j)
-                inFile >> _aAlgn_Profile[i][j];
-        }
-
-        bAlgn_Rdy = true;
-
-        std::string fFragName = sDirectory + RelativeFileName("fragment");
-        if (utility::FileExists(fFragName)) {
-            std::ifstream inFile(fFragName);
+    if (nFlag & SolID) {
+        std::string fSolvName = sDirectory + RelativeFileName("solvent");
+        if (utility::FileExists(fSolvName)) {
+            std::ifstream inFile(fSolvName);
 
             HEAD = "";
             while (HEAD != sFileStartSym)
                 inFile >> HEAD;
 
-            for (int i, j; inFile >> i >> j >> HEAD; )
-                _matFragments[i][j].emplace_back(HEAD);
+            for (int i = 0; i < 20; ++i) {
+                inFile >> HEAD;
+                for (int j = 0; j < 7; ++j)
+                    inFile >> _aSolvent_Profile[i][j];
+            }
 
-            bFrags_Rdy = true;
+            bSolvent_Rdy = true;
+        }
+    }
+
+    if (nFlag & SecID) {
+        std::string fSecName = sDirectory + RelativeFileName("sec");
+        if (utility::FileExists(fSecName)) {
+            std::ifstream inFile(fSecName);
+
+            HEAD = "";
+            while (HEAD != sFileStartSym)
+                inFile >> HEAD;
+
+            for (int i = 0; i < 20; ++i) {
+                inFile >> HEAD;
+                for (int j = 0; j < 7; ++j)
+                    inFile >> _aSec_Profile[i][j];
+            }
+
+            bSS_Rdy = true;
         }
     }
 
 
-    std::string fFamily = sDirectory + RelativeFileName("family");
-    if (utility::FileExists(fFamily)) {
-        std::ifstream inFile(fFamily);
+    if (nFlag & PotID) {
+        std::string fPotName = sDirectory + RelativeFileName("pot");
+        if (utility::FileExists(fPotName)) {
+            std::ifstream inFile(fPotName);
 
-        HEAD = "";
-        while (HEAD != sFileStartSym)
-            inFile >> HEAD;
+            HEAD = "";
+            while (HEAD != sFileStartSym) {
+                if (HEAD.find("POT_S_PARAMETER") == 0) {
+                    inFile >> PARAM;
+                    _dPotS_Param = PARAM;
+                }
+                inFile >> HEAD;
+            }
 
-        std::vector<std::string> vecFamily;
-        while (std::getline(inFile, HEAD))
-            if (HEAD != "")
-                vecFamily.push_back(HEAD);
-        Find_Homologous_Proteins(vecFamily);
+            for (int i = 0; i < 20; ++i)
+                inFile >> HEAD >> _aPot_Bar[i] >> _aPot_Stdev[i];
+
+
+            while (HEAD != sFileStartSym)
+                inFile >> HEAD;
+            for (int i = 0; i < 20; ++i)
+                inFile >> HEAD >> _aAA_Freq_Mean[i] >> _aAA_Freq_Stdev[i];
+
+            bPot_Rdy = true;
+        }
+    }
+
+    if (nFlag & AlgnID) {
+        std::string fAlgnName = sDirectory + RelativeFileName("alignment");
+        if (utility::FileExists(fAlgnName)) {
+            std::ifstream inFile(fAlgnName);
+
+            HEAD = "";
+            while (HEAD != sFileStartSym) {
+                if (HEAD.find("ALGN_SCORE_CUTOFF") == 0) {
+                    inFile >> PARAM;
+                    _dAlgn_Score_CutOff = PARAM;
+                }
+                if (HEAD.find("FRAG_DIST_CUTOFF") == 0) {
+                    inFile >> PARAM;
+                    _dFrag_Score_Cutoff = PARAM;
+                }
+                if (HEAD.find("GAP_PENALTY") == 0) {
+                    inFile >> PARAM;
+                    _dGap_Penalty = PARAM;
+                }
+                if (HEAD.find("MIN_FRAG_LENGTH") == 0) {
+                    inFile >> PARAM;
+                    _nMin_Frag = PARAM;
+                }
+                inFile >> HEAD;
+            }
+            for (int i = 0; i < _refProtein.length(); ++i) {
+                inFile >> HEAD;
+                for (int j = 0; j < 7; ++j)
+                    inFile >> _aAlgn_Profile[i][j];
+            }
+
+            bAlgn_Rdy = true;
+
+            if (nFlag & FragID) {
+                std::string fFragName = sDirectory + RelativeFileName("fragment");
+                if (utility::FileExists(fFragName)) {
+                    std::ifstream inFile(fFragName);
+
+                    HEAD = "";
+                    while (HEAD != sFileStartSym)
+                        inFile >> HEAD;
+
+                    for (int i, j; inFile >> i >> j >> HEAD; )
+                        _matFragments[i][j].emplace_back(HEAD);
+
+                    bFrags_Rdy = true;
+                }
+            }
+        }
+    }
+
+    if (nFlag & FamID) {
+        std::string fFamily = sDirectory + RelativeFileName("family");
+        if (utility::FileExists(fFamily)) {
+            std::ifstream inFile(fFamily);
+
+            HEAD = "";
+            while (HEAD != sFileStartSym)
+                inFile >> HEAD;
+
+            std::vector<std::string> vecFamily;
+            while (std::getline(inFile, HEAD))
+                if (HEAD != "")
+                    vecFamily.push_back(HEAD);
+            Find_Homologous_Proteins(vecFamily);
+        }
     }
 }
 

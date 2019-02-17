@@ -42,32 +42,21 @@ public:
 	void Find_Homologous_Proteins(std::vector<std::string> vecDB,
 	                              double bVerbose = false);
 
-	void CalculateProfiles(int nFlag = 1 + 2 + 4 + 8,
-	                       bool bVerbose = false,
-	                       bool bSave_Frags = true);
+	bool CalculateProfiles(int nFlag = SolID + SecID + PotID + AlgnID + FragID,
+	                       bool bVerbose = false);
 
-	bool CalculateRemainingProfiles(std::optional<std::vector<std::string>> vecDB,
-	                                bool bVerbose = false);
+	int RemainingProfiles();
 
-	void Read_FromFile(std::string sDirectory = db_Profiles);
-	void Write_ToFile(bool bWriteCounts = false, std::string sDirectory = db_Profiles);
+	void Read_FromFile(std::string sDirectory = db_Profiles,
+	                   int nFlag = SolID + SecID + PotID + AlgnID + FragID + FamID);
+	void Write_ToFile(std::string sDirectory = db_Profiles,
+	                  int nFlag = SolID + SecID + PotID + AlgnID + FragID + FamID);
 	std::string QuickInfo(bool bIncludeAlignInfo = false);
 	bool FragmentExists(int i, int j);
 	std::string FragmentFetch(int i, int j);
 
 
 private:
-	template<class FuncType, class vecType>
-	void Thread_Manager(std::vector<std::function<FuncType> > vecFunctions,
-	                    std::vector<vecType>& vecDatabase,
-	                    bool bVerbose = false, std::string sMsg = "",
-	                    int nThreads = std::thread::hardware_concurrency());
-
-	template<class FuncType, class vecType>
-	void Processing_Thread(std::vector<std::function<FuncType> > vecFunctions,
-	                       std::vector<vecType> vecBatch, int& nCount_Now);
-
-
 	void Calculate_Solvent_Profile();
 	void Calculate_SS_Profile();
 	void Calculate_Pot_AAFreq_Profile();
@@ -85,6 +74,8 @@ private:
 	double _dPotS_Param; // Pot parameter
 	int _nMin_Frag;
 
+	static const int SolID{ 1 }, SecID{ 2 }, PotID{ 4 }, AlgnID{ 8 },
+	       FragID{ 16 }, FamID{ 32 }, countID{ 64 };
 	bool bAlgn_Rdy{ false }, bFrags_Rdy{ false }, bSolvent_Rdy{ false },
 	     bSS_Rdy{ false }, bPot_Rdy { false };
 
@@ -97,12 +88,12 @@ private:
 	std::vector<std::tuple<double, std::string, std::string, std::vector<double> >> _vecTupleAlignments;
 
 	// Objects used in preprocessing
-	std::array<std::array<long long, 7>, 20> _aSolvent_AA_Count{ }, _aSec_AA_Count{ };
+	std::array<std::array<long long, 7>, 20> _aSolvent_AA_Count, _aSec_AA_Count;
 	std::array<std::vector<double>, 20> _vecPotScores, _vecAA_Freqs;
-	std::array<long long, 20> _aAA_Total_Count{ };
-	std::vector<long long> _aAlgn_Position_Count{ };
-	std::array<long long, 7> _aAlgn_Class_Count{ };
-	inline static std::mutex _mtx_count, _mtx_SS, _mtx_solvent, _mtx_pot, _mtx_algn; // Mutexs used in threads
+	std::array<long long, 20> _aAA_Total_Count;
+	std::vector<long long> _aAlgn_Position_Count;
+	std::array<long long, 7> _aAlgn_Class_Count;
+	inline static std::mutex _mtx_SS, _mtx_solvent, _mtx_pot, _mtx_algn; // Mutexs used in threads
 };
 
 
