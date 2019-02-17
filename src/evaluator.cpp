@@ -32,7 +32,7 @@ double Evaluator::O_Fitna(Protein &target, ProteinProfile& profiles, DFIRE2& dDF
     score[1] = Secondary_Struct(target, profiles._aSec_Profile);
     score[2] = AlignmentScore(target, profiles._aAlgn_Profile);
     score[3] = dDFIRE_Inst.Calc_CFE(target) / (target.length() * dDFIRE_COEF);
- //   score[4] = PotScore(target, profiles._aPot_Bar, profiles._aPot_Stdev, profiles._dPotS_Param);
+//   score[4] = PotScore(target, profiles._aPot_Bar, profiles._aPot_Stdev, profiles._dPotS_Param);
     auto ret = FrequencyScore(target, profiles._aAA_Freq_Mean, profiles._aAA_Freq_Stdev);
     std::copy(ret.begin(), ret.end(), score.begin() + 5);
 
@@ -54,7 +54,7 @@ std::array<double, 20> Evaluator::PotScore(Protein& target,
 
     int n = target.length();
     for (int i = 0; i < 20; ++i) {
-        if (target.aAA_Freqs[i] * n < 2)
+        if (target.aAA_Freqs[i] * n < 2 || aPot_Stdev[i] == 0)
             continue;
         retPot_scores[i] = 0.5 * std::pow((target.aPot_Values[i] - aPot_Bar[i]) / aPot_Stdev[i], 2)
                            - log(1 / (aPot_Stdev[i] * std::sqrt(2 * M_PI)));
@@ -124,8 +124,11 @@ std::array<double, 20> Evaluator::FrequencyScore(Protein& target,
 {
     std::array<double, 20> retAA_scores{};
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 20; ++i) {
+        if (aAA_Freq_Stdev[i] == 0)
+            continue;
         retAA_scores[i] = std::abs((target.aAA_Freqs[i] - aAA_Freq_Mean[i]) / aAA_Freq_Stdev[i]);
+    }
 
     return retAA_scores;
 }
