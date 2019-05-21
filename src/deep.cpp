@@ -20,7 +20,7 @@ void DeepAI::CheckFamilies(std::string sFDir)
 		std::string HEAD, NAME;
 		ifsFamily >> HEAD >> NAME;
 
-		// utility::Progress_Indicator(NAME, 0, 1);
+		utility::Progress_Indicator(NAME, 0, 1);
 		while (HEAD != sFileStartSym)
 			ifsFamily >> HEAD;
 
@@ -32,12 +32,10 @@ void DeepAI::CheckFamilies(std::string sFDir)
 				}
 				else if (setSearch.count(HEAD) == 0) {
 					std::cout << "Problem in " << fPath << ":" << NAME << "\t" << "File: " << HEAD << "\n";
-					// std::cout << "Problem in " << fPath << "\t" << "File: " << HEAD << "\n";
-
 				}
 			}
 		}
-		// utility::Progress_Indicator(NAME, 1, 1);
+		utility::Progress_Indicator(NAME, 1, 1);
 	}
 }
 

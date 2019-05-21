@@ -20,7 +20,9 @@ int main(int argc, const char * argv[]) {
 
 	auto vecDB = utility::CATH_ListFiles(db_CATH);
 	DeepAI DI;
-	DI.CheckFamilies("./FamilyProfiles/");
+	// DI.CheckFamilies("./FamilyProfiles/");
+	DI.GenerateDataset("./FamilyProfiles/", "dataset.csv", 10);
+
 
 	// std::ofstream trFile("ole.csv");
 
