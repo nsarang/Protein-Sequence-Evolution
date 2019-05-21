@@ -3,17 +3,20 @@
 
 std::tuple<double, double> Mean_SD(std::vector<double> &vecInp) {
     assert(vecInp.size() > 1);
-    double ret_mean, ret_stdev;
 
-    ret_mean = gsl_stats_mean(vecInp.data(), 1, vecInp.size());
-    ret_stdev = gsl_stats_sd_m(vecInp.data(), 1, vecInp.size(), ret_mean);
+    double sum = std::accumulate(vecInp.begin(), vecInp.end(), 0.0);
+    double ret_mean = sum / vecInp.size();
+
+    double sq_sum = std::inner_product(vecInp.begin(), vecInp.end(), vecInp.begin(), 0.0);
+    double ret_stdev = std::sqrt((sq_sum - ret_mean*ret_mean*vecInp.size()) / (vecInp.size()-1));
+
     return std::tuple(ret_mean, ret_stdev);
 }
 
 
 std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double coef) {
     assert(vecInp.size());
-    
+
     int Q1, Q2, Q3;
     Q1 = vecInp.size() / 4;
     Q2 = vecInp.size() / 2;
@@ -29,6 +32,7 @@ std::vector<double> OutlierElimination_IQR(std::vector<double> vecInp, double co
 }
 
 
+/*
 int gsl_polynomialfit_robust(size_t n, size_t deg,
                              std::vector<double> &dx, std::vector<double> &dy,
                              double ret_coef[], double ret_cov[],
@@ -44,7 +48,7 @@ int gsl_polynomialfit_robust(size_t n, size_t deg,
     cov = gsl_matrix_alloc (deg, deg);
 
 
-    /* construct design matrix X for linear fit */
+    // construct design matrix X for linear fit
     for (size_t i = 0; i < n; ++i)
     {
         gsl_vector_set (x, i, dx[i]);
@@ -53,7 +57,7 @@ int gsl_polynomialfit_robust(size_t n, size_t deg,
         gsl_matrix_set (X, i, 1, dx[i]);
     }
 
-    /* perform robust fit */
+    // perform robust fit
     gsl_multifit_robust_workspace *ws = gsl_multifit_robust_alloc(robust_type, X->size1, X->size2);
     int s = gsl_multifit_robust (X, y, coef, cov, ws);
 
@@ -69,7 +73,7 @@ int gsl_polynomialfit_robust(size_t n, size_t deg,
                 ret_cov[i + j] = COV(i, j);
     }
 
-    /* output data and model */
+    // output data and model
 //   for (size_t i = 0; i < n; ++i)
 //   {
 //     double xi = gsl_vector_get(x, i);
@@ -102,3 +106,4 @@ int gsl_polynomialfit_robust(size_t n, size_t deg,
 
     return s;
 }
+*/
