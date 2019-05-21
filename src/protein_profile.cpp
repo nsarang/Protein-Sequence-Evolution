@@ -30,6 +30,7 @@ void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB,
     vecProcs.push_back(std::bind(&ProteinProfile::Process_IsHomologue, this, _1));
     utility::Thread_Manager(vecProcs, vecDB, bVerbose,
                             "Searching for proteins homologous to the target structure");
+    _nFamilySize = _vecHomologous_Proteins.size();
 }
 
 
@@ -514,6 +515,10 @@ void ProteinProfile::Read_FromFile(std::string sDirectory, int nFlag) {
 
             HEAD = "";
             while (HEAD != sFileStartSym) {
+                if (HEAD.find("TEMPLATES_COUNT") == 0) {
+                    int iN; inFile >> iN;
+                    _nFamilySize = iN;
+                }
                 if (HEAD.find("ALGN_SCORE_CUTOFF") == 0) {
                     inFile >> PARAM;
                     _dAlgn_Score_CutOff = PARAM;
@@ -583,7 +588,7 @@ std::string ProteinProfile::QuickInfo(bool bIncludeAlignInfo) {
     output << "FILE_PATH:  " << _refProtein.fPath << "\n"
            << "MD5:  " << _refProtein.md5 << "\n"
            << "PROT_LEN:  " << _refProtein.length() << "\n"
-           << "TEMPLATES_COUNT:  " << _vecHomologous_Proteins.size() << "\n"
+           << "TEMPLATES_COUNT:  " << _nFamilySize << "\n"
            << "ALGN_SCORE_CUTOFF:  " << _dAlgn_Score_CutOff << "\n"
            << "POT_S_PARAMETER:  " << _dPotS_Param << "\n";
 
@@ -635,4 +640,10 @@ bool ProteinProfile::FragmentExists(int i, int j) {
 
 std::string ProteinProfile::FragmentFetch(int i, int j) {
     return _matFragments[i][j][rand() % _matFragments[i][j].size()];
+}
+
+
+
+int ProteinProfile::FamilySize() {
+    return _nFamilySize;
 }

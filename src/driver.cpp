@@ -20,8 +20,22 @@ int main(int argc, const char * argv[]) {
 
 	auto vecDB = utility::CATH_ListFiles(db_CATH);
 	DeepAI DI;
-	auto vecProfiles = DI.PrepareProfiles("./FamilyProfiles/");
-	DI.GenerateDataset(vecProfiles, "dataset.csv", 10);
+	DI.CheckFamilies("./FamilyProfiles/");
+
+	// std::ofstream trFile("ole.csv");
+
+
+	// for (int i = 0; i < 1000; ++i) {
+	// 		auto pr = ProteinProfile(Protein("./CATH/1y6dA00"));
+	// 		pr.Read_FromFile(db_Profiles, 1 + 2 + 4 + 8);
+	// 	auto po = Protein(vecDB[10]);
+	// 	DI.GenerateData(pr, po, trFile);
+	// 	std::cerr << i << "\n";
+	// }
+
+	// DI.GenerateDataset("./FamilyProfiles/", "dataset.csv", 10);
+	// auto vecProfiles = DI.PrepareProfiles("./FamilyProfiles/");
+	//DI.GenerateDataset(vecProfiles, "dataset.csv", 10);
 
 
 /*
