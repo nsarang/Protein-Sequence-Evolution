@@ -1,6 +1,7 @@
-_History/
-_Tests/
-Rzbny SS Parse/
-CATH/
-# .[oa]Alignments/
-Protein Sequence Evolution.xcodeproj/xcuserdata/blaze.xcuserdatad/xcdebugger/
+.DS_Store
+src/STRIDE
+history
+*.o
+*.depend
+dataset.csv
+.ipynb_checkpoints
