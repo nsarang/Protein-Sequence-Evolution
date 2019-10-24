@@ -1,6 +1,4 @@
 .DS_Store
-data/CATH
-data/Profiles
 src/STRIDE
 history
 *.o
