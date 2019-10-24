@@ -33,6 +33,7 @@ class ProteinProfile {
 
 public:
 	ProteinProfile(Protein target,
+				   int nMax_FamilySize = MAX_FAM_SIZE,
 	               double dAlgn_Score_CutOff = ALIGN_SC_CUTTOFF,
 	               double dFrag_Score_Cutoff = DIST_CUTOFF,
 	               double dGap_Penalty = GAP_PENALTY,
@@ -73,7 +74,7 @@ private:
 	Protein _refProtein; // Target protein
 	double _dAlgn_Score_CutOff, _dFrag_Score_Cutoff, _dGap_Penalty; // Alignment parameters
 	double _dPotS_Param; // Pot parameter
-	int _nMin_Frag, _nFamilySize{ 0 };
+	int _nMax_FamSize, _nMin_Frag, _nFamilySize{ 0 };
 
 	static const int SolID{ 1 }, SecID{ 2 }, PotID{ 4 }, AlgnID{ 8 },
 	       FragID{ 16 }, FamID{ 32 }, countID{ 64 };

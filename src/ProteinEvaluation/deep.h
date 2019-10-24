@@ -23,7 +23,7 @@ public:
 	                     int nFamCutoff);
 
 	void GenerateData(ProteinProfile& profile, Protein prot,
-	                  std::ofstream& outFile, std::string sep = ",");
+	                  std::ostream& outFile, std::string sep = ",");
 
 	double PairAlgnScore(std::string PDB_1, std::string PDB_2);
 };

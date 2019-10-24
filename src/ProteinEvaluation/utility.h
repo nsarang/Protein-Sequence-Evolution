@@ -32,6 +32,10 @@ const char BOLDGREEN[] = "\033[1m\033[32m";
 const int BUFFERSIZE = 1024;
 
 
+template<class vecType>
+std::vector<vecType> VectorSubset(const std::vector<vecType>& vec,
+    							  const std::vector<size_t>& indices);
+
 
 template<class FuncType, class vecType>
 void Thread_Manager(std::vector<std::function<FuncType> > vecFunctions,

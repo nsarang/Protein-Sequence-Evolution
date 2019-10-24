@@ -5,12 +5,12 @@
 
 
 // PATHS
-const std::string db_CATH = "./CATH/";
-const std::string db_Profiles = "./Profiles/";
-const std::string db_DFIRE2 = "./Config/dDFIRE.lib";
-const std::string fl_CATH_BL = "./Config/cath_blacklist.txt";
-const std::string ex_STRIDE = "./STRIDE/stride";
-const std::string ex_TMALIGN = "./TMalign/TMalign";
+const std::string db_CATH = "./data/CATH/";
+const std::string db_Profiles = "./data/Profiles/";
+const std::string db_DFIRE2 = "./data/dDFIRE.lib";
+const std::string fl_CATH_BL = "./data/cath_blacklist.txt";
+const std::string ex_STRIDE = "./bin/stride";
+const std::string ex_TMALIGN = "./bin/TMalign";
 const std::string sFileStartSym = "~^&%@";
 
 // MATH
@@ -35,7 +35,8 @@ const double DIST_CUTOFF = .8,
              GAP_PENALTY = 15,
              GAP_NUMBER = 99,
              ALIGN_SC_CUTTOFF = .5;
-const int FRAG_MIN_LEN = 4;
+const int MAX_FAM_SIZE = 20,
+		  FRAG_MIN_LEN = 4;
 
 
 // WEIGHTS

@@ -1,6 +1,6 @@
 #Protein Sequence Evolution
 
-PROG=NewProtEvol
+PROG=gendata
 CC=gcc-8
 CXX=g++-8
 CXXFLAGS+=-std=c++17 -g -Wall -pedantic
@@ -9,13 +9,13 @@ LDFLAGS+= -lstdc++fs -pthread
 #LDFLAGS+= `gsl-config --libs` 
 RM=rm -f
 
-SRCS=driver.cpp protein.cpp protein_profile.cpp evaluator.cpp utility.cpp mapping.cpp dDFIRE2.cpp statistics.cpp deep.cpp
+SRCS=gendata.cpp protein.cpp protein_profile.cpp evaluator.cpp utility.cpp mapping.cpp dDFIRE2.cpp statistics.cpp deep.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
 
 
 all: $(OBJS)
-	$(CXX) -o ../$(PROG) $(OBJS) $(LDFLAGS)
+	$(CXX) -o "$(BINDIR)/$(PROG)" $(OBJS) $(LDFLAGS)
 
 
 depend: .depend

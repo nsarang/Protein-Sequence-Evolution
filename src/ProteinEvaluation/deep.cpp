@@ -101,7 +101,7 @@ void DeepAI::GenerateDataset(std::string sFamDir,
 
 
 void DeepAI::GenerateData(ProteinProfile& profile, Protein prot,
-                          std::ofstream& outFile, std::string sep)
+                          std::ostream& outFile, std::string sep)
 {
 	static DFIRE2 dDFIRE_Inst(db_DFIRE2);
 	static std::mutex _mtx_write;

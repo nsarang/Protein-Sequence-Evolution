@@ -11,7 +11,7 @@ FORTRAN_PROGRAMS=TMalign
 all: ${FORTRAN_PROGRAMS}
 
 TMalign: TMalign.f
-	${FC} ${FFLAGS} -o ../TMalign TMalign.f
+	${FC} ${FFLAGS} -o "$(BINDIR)/TMalign" TMalign.f
 
 
 install: all
