@@ -36,7 +36,7 @@ def execute(cmd):
      
 
 def get_features(params):
-    for line in execute(["./bin/gendata", *params]):
+    for line in execute([EXE_PATH, *params]):
         if line == "\n":
             pass
         elif line.startswith("OUTPUT"):
