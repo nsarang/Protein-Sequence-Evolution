@@ -349,8 +349,11 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, int nFlag) {
 		std::ofstream outFile(sDirectory + RelativeFileName("family"));
 		outFile << QuickInfo(true) << "\n\n" << "#PROTEIN_FAMILY\n\n"
 		        << sFileStartSym << "\n";
+		for (int i = 0; i < _vecHomologous_Proteins.size(); ++i)
 		for (auto P : _vecHomologous_Proteins)
-			outFile << P.fPath << "\n";
+			outFile << _vecHomologous_Proteins[i].fPath << std::fixed 
+		            << std::setprecision(5) << std::get<0>(_vecTupleAlignments[i])
+		            << "\n";
 	}
 
 
@@ -363,7 +366,8 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, int nFlag) {
 		for (int i = 0; i < 20; ++i) {
 			outFile << idx_to_sym[i];
 			for (int j = 0; j < 7; ++j)
-				outFile << " " << std::fixed << std::setprecision(10) << _aSolvent_Profile[i][j];
+				outFile << " " << std::fixed << std::setprecision(10)
+			            << _aSolvent_Profile[i][j];
 			outFile << "\n";
 		}
 	}
@@ -378,7 +382,8 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, int nFlag) {
 		for (int i = 0; i < 20; ++i) {
 			outFile << idx_to_sym[i];
 			for (int j = 0; j < 7; ++j)
-				outFile << " " << std::fixed << std::setprecision(10) << _aSec_Profile[i][j];
+				outFile << " " << std::fixed << std::setprecision(10)
+			            << _aSec_Profile[i][j];
 			outFile << "\n";
 		}
 	}
@@ -404,18 +409,21 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, int nFlag) {
 
 	if ((nFlag & AlgnID) && bAlgn_Rdy) {
 		std::ofstream outFile(sDirectory + RelativeFileName("alignment"));
-		outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_PROFILE\n\n" << sFileStartSym << "\n";
+		outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_PROFILE\n\n"
+		        << sFileStartSym << "\n";
 
 		for (int i = 0; i < _refProtein.length(); ++i) {
 			outFile << std::left << std::setw(3) << i + 1;
 			for (int j = 0; j < 7; ++j)
-				outFile << " " << std::fixed << std::setprecision(10) << _aAlgn_Profile[i][j];
+				outFile << " " << std::fixed << std::setprecision(10)
+			            << _aAlgn_Profile[i][j];
 			outFile << "\n";
 		}
 
 		if ((nFlag & FragID) && bFrags_Rdy) {
 			std::ofstream outFile(sDirectory + RelativeFileName("fragment"));
-			outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_FRAGMENTS\n\n" << sFileStartSym << "\n";
+			outFile << QuickInfo(true) << "\n\n" << "#ALIGNMENT_FRAGMENTS\n\n"
+			        << sFileStartSym << "\n";
 			for (int i = 0; i < _refProtein.length(); ++i)
 				for (int j = i; j < _refProtein.length(); ++j)
 					for (auto& sFragment : _matFragments[i][j])
@@ -590,8 +598,10 @@ void ProteinProfile::Read_FromFile(std::string sDirectory, int nFlag) {
 
 			std::vector<std::string> vecFamily;
 			while (std::getline(inFile, HEAD))
-				if (HEAD != "")
+				if (HEAD != "") {
+					HEAD = utility::split(HEAD, "\\s")[0];
 					vecFamily.push_back(HEAD);
+				}
 			Find_Homologous_Proteins(vecFamily);
 		}
 	}
