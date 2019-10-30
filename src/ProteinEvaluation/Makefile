@@ -17,9 +17,12 @@ RMDIR    := rd /S /Q
 RM       := rm -f
 
 
+ifeq (, $(shell which $(CXX)))
+$(error "$(CXX) is required")
+endif
+
 
 .PHONY: all clean
-
 
 all: $(TARGETS)
 
