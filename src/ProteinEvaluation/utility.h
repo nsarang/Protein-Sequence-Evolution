@@ -18,6 +18,7 @@
 #include <mutex>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <regex>
 #include "constants.h"
 #include "cpplocate.hpp"
 #include "mapping.h"
@@ -54,6 +55,8 @@ std::vector<std::string> CATH_ListFiles(std::string path);
 void Progress_Indicator(std::string text, long long current, long long total);
 
 // int system_call_err(std::string command, std::string& stdout);
+
+std::vector<std::string> split(const std::string input, const std::string regex);
 
 void ltrim(std::string &s);
 
