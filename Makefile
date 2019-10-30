@@ -1,4 +1,4 @@
-BINDIR=$(abspath "./bin")
+BINDIR=$(abspath bin)
 export BINDIR
 
 all: 
