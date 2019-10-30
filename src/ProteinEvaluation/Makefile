@@ -1,33 +1,33 @@
-#Protein Sequence Evolution
+TARGETS  := gscores gprofs driver
+CC       := gcc-8
+CXX      := g++-8
+# INCLUDE  := .
+# SRC      := .
+OBJ      := .
+# SRCS    := $(wildcard $(SRC)/*.c)
+SRCS     := protein.cpp protein_profile.cpp evaluator.cpp utility.cpp mapping.cpp dDFIRE2.cpp statistics.cpp deep.cpp
+OBJS     := $(subst .cpp,.o,$(SRCS))
+# EXE      := $(BIN)/main
+CXXFLAGS += -std=c++17 -g -Wall -pedantic
+# CFLAGS   := -I$(INCLUDE)
+LDFLAGS  += -lstdc++fs -pthread
+# LDLIBS   := -lm
+MKDIR    := md
+RMDIR    := rd /S /Q
+RM       := rm -f
 
-PROG=gendata
-CC=gcc-8
-CXX=g++-8
-CXXFLAGS+=-std=c++17 -g -Wall -pedantic
-#CXXFLAGS+= `gsl-config --cflags`
-LDFLAGS+= -lstdc++fs -pthread
-#LDFLAGS+= `gsl-config --libs` 
-RM=rm -f
-
-SRCS=gendata.cpp protein.cpp protein_profile.cpp evaluator.cpp utility.cpp mapping.cpp dDFIRE2.cpp statistics.cpp deep.cpp
-OBJS=$(subst .cpp,.o,$(SRCS))
 
 
-
-all: $(OBJS)
-	$(CXX) -o "$(BINDIR)/$(PROG)" $(OBJS) $(LDFLAGS)
+.PHONY: all clean
 
 
-depend: .depend
+all: $(TARGETS)
 
-.depend: $(SRCS)
-	$(RM) ./.depend
-	$(CXX) $(CXXFLAGS) -MM $^>>./.depend;
+$(TARGETS): % : %.o $(OBJS)
+	$(CXX) $(LDFLAGS) $^ -o "$(BINDIR)/$@" $(LDLIBS)
+
+$(OBJ)/%.o: $(SRC)/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(OBJS)
-
-distclean: clean
-	$(RM) *~ .depend
-
-include .depend
+	$(RM) $(OBJ)/*.o

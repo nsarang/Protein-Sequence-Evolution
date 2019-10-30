@@ -18,10 +18,13 @@ int main(int argc, const char * argv[]) {
 	// auto target = Protein(target_path, 1 + 2 + 4 + 8);
 
 
-	auto vecDB = utility::CATH_ListFiles(db_CATH);
-	DeepAI DI;
-	// DI.CheckFamilies("./FamilyProfiles/");
-	DI.GenerateDataset("./FamilyProfiles/", "dataset.csv", 10);
+	cout << utility::split("ole bole jj", "\\s")[1] << "\n";
+
+
+	// auto vecDB = utility::CATH_ListFiles(db_CATH);
+	// DeepAI DI;
+	// // DI.CheckFamilies("./FamilyProfiles/");
+	// DI.GenerateDataset("./FamilyProfiles/", "dataset.csv", 10);
 
 
 	// std::ofstream trFile("ole.csv");
