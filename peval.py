@@ -4,7 +4,7 @@ import subprocess
 import xgboost as xgb
 import numpy as np
 
-EXE_PATH = "bin/gendata"
+EXE_PATH = "bin/gscores"
 XGB_MODEL = "data/xgbreg.bin"
 
 
