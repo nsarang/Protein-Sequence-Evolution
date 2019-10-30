@@ -34,8 +34,8 @@ const int Pot_S_Constant = 2;
 const double DIST_CUTOFF = .8,
              GAP_PENALTY = 15,
              GAP_NUMBER = 99,
-             ALIGN_SC_CUTTOFF = .5;
-const int MAX_FAM_SIZE = 20,
+             ALIGN_SC_CUTTOFF = .4;
+const int MAX_FAM_SIZE = 10,
 		  FRAG_MIN_LEN = 4;
 
 
