@@ -350,7 +350,6 @@ void ProteinProfile::Write_ToFile(std::string sDirectory, int nFlag) {
 		outFile << QuickInfo(true) << "\n\n" << "#PROTEIN_FAMILY\n\n"
 		        << sFileStartSym << "\n";
 		for (int i = 0; i < _vecHomologous_Proteins.size(); ++i)
-		for (auto P : _vecHomologous_Proteins)
 			outFile << _vecHomologous_Proteins[i].fPath << " " << std::fixed 
 		            << std::setprecision(5) << std::get<0>(_vecTupleAlignments[i])
 		            << "\n";
