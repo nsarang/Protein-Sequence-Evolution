@@ -32,8 +32,15 @@ int main(int argc, const char * argv[]) {
 		auto prot = Protein(fPath);
 		auto profile = ProteinProfile(prot);
 
-		profile.Find_Homologous_Proteins(vecDB);
-		profile.CalculateProfiles(1 + 2 + 4 + 8);
-		profile.Write_ToFile();
+		profile.Read_FromFile(db_Profiles, 1 + 2 + 4 + 8);
+		if (profile.RemainingProfiles() != 0)
+		{
+			profile.Read_FromFile(db_Profiles, 32);
+			if (profile.FamilySize() == 0) {
+				profile.Find_Homologous_Proteins(vecDB);
+			}
+ 			profile.CalculateProfiles( profile.RemainingProfiles() );
+			profile.Write_ToFile(db_Profiles, 1 + 2 + 4 + 8 + 32);
+		}
 	}
 }
