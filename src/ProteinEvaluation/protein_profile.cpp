@@ -599,7 +599,8 @@ void ProteinProfile::Read_FromFile(std::string sDirectory, int nFlag) {
 			while (std::getline(inFile, HEAD))
 				if (HEAD != "") {
 					HEAD = utility::split(HEAD, "\\s")[0];
-					vecFamily.push_back(HEAD);
+					HEAD = utility::split(HEAD, "\\/").back();
+					vecFamily.push_back(db_CATH + HEAD);
 				}
 			Find_Homologous_Proteins(vecFamily);
 		}
