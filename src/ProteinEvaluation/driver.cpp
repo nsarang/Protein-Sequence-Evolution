@@ -17,8 +17,21 @@ int main(int argc, const char * argv[]) {
 	// std::string target_path = argv[1];
 	// auto target = Protein(target_path, 1 + 2 + 4 + 8);
 
+	std::string HEAD;
 
-	cout << utility::split("ole bole jj", "\\s")[1] << "\n";
+
+	HEAD = "./CATH/2e5yA01";
+	HEAD = utility::split(HEAD, "\\s")[0];
+	HEAD = utility::split(HEAD, "\\/").back();
+
+	cout << db_CATH + HEAD << "\n";
+
+
+	HEAD = "./CATH/2e5yA01 0.5352";
+	HEAD = utility::split(HEAD, "\\s")[0];
+	HEAD = utility::split(HEAD, "/").back();
+
+	cout << HEAD << "\n";
 
 
 	// auto vecDB = utility::CATH_ListFiles(db_CATH);
