@@ -1,7 +1,7 @@
-#include "deep.h"
+#include "dataset.h"
 
 
-void DeepAI::CheckFamilies(std::string sFDir)
+void Dataset::CheckFamilies(std::string sFDir)
 {
 	auto vecDB = utility::CATH_ListFiles(db_CATH);
 	std::set<std::string> setSearch;
@@ -40,7 +40,7 @@ void DeepAI::CheckFamilies(std::string sFDir)
 }
 
 
-void DeepAI::GenerateDataset(std::string sFamDir,
+void Dataset::GenerateDataset(std::string sFamDir,
                              std::string fCSV,
                              int nFamCutoff)
 {
@@ -100,7 +100,15 @@ void DeepAI::GenerateDataset(std::string sFamDir,
 }
 
 
-void DeepAI::GenerateData(ProteinProfile& profile, Protein prot,
+/**
+ * @brief 			Engineer features to be given as input to the ML model. klmk
+ * 
+ * @param profile	Profile of the target structure
+ * @param prot      
+ * @param outFile 
+ * @param sep 
+ */
+void Dataset::GenerateData(ProteinProfile& profile, Protein prot,
                           std::ostream& outFile, std::string sep)
 {
 	static DFIRE2 dDFIRE_Inst(db_DFIRE2);
@@ -133,7 +141,7 @@ void DeepAI::GenerateData(ProteinProfile& profile, Protein prot,
 }
 
 
-double DeepAI::PairAlgnScore(std::string PDB_1, std::string PDB_2)
+double Dataset::PairAlgnScore(std::string PDB_1, std::string PDB_2)
 {
 	std::string stdout, line;
 	auto oBuffer = subprocess::check_output({ex_TMALIGN.c_str(),

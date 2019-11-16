@@ -35,7 +35,7 @@ struct AminoAcid {
 class Protein {
 	friend class ProteinProfile;
 	friend class Evaluator;
-	friend class DeepAI;
+	friend class Dataset;
 
 public:
 	Protein(std::string fPath, int nFlag = 0, double dPotS_Param = Pot_S_Constant,

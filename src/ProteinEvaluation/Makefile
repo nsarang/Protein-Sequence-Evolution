@@ -5,7 +5,7 @@ CXX      := g++-8
 # SRC      := .
 OBJ      := .
 # SRCS    := $(wildcard $(SRC)/*.c)
-SRCS     := protein.cpp protein_profile.cpp evaluator.cpp utility.cpp mapping.cpp dDFIRE2.cpp statistics.cpp deep.cpp
+SRCS     := protein.cpp protein_profile.cpp evaluator.cpp utility.cpp mapping.cpp dDFIRE2.cpp statistics.cpp dataset.cpp
 OBJS     := $(subst .cpp,.o,$(SRCS))
 # EXE      := $(BIN)/main
 CXXFLAGS += -std=c++17 -g -Wall -pedantic

@@ -14,7 +14,7 @@
 
 
 
-class DeepAI {
+class Dataset {
 public:
 	void CheckFamilies(std::string sFDir);
 

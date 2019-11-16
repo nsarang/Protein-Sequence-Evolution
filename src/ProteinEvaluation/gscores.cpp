@@ -8,7 +8,7 @@
 #include "protein.h"
 #include "protein_profile.h"
 #include "evaluator.h"
-#include "deep.h"
+#include "dataset.h"
 using namespace std;
 
 
@@ -63,6 +63,6 @@ int main(int argc, const char * argv[]) {
 
 	// Output scores
 	std::cout << "OUTPUT: ";
-	DeepAI DI;
+	Dataset DI;
 	DI.GenerateData(profile, prot, std::cout, " ");
 }
