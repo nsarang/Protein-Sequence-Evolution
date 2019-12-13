@@ -58,6 +58,10 @@ void Progress_Indicator(std::string text, long long current, long long total);
 
 std::vector<std::string> split(const std::string input, const std::string regex);
 
+bool startswith(const std::string source, const std::string query);
+
+bool endswith(const std::string source, const std::string query);
+
 void ltrim(std::string &s);
 
 void rtrim(std::string &s);
