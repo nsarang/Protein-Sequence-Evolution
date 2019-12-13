@@ -12,7 +12,7 @@ void Dataset::CheckFamilies(std::string sFDir)
 		auto fPath = eEntry.path().string();
 		auto baseName = eEntry.path().filename().string();
 
-		if (baseName.rfind("Family", 0) != 0)
+		if (!utility::startswith(baseName, "Family"))
 			continue;
 
 		std::ifstream ifsFamily(fPath);
@@ -41,6 +41,75 @@ void Dataset::CheckFamilies(std::string sFDir)
 		}
 		utility::Progress_Indicator(NAME, 1, 1);
 	}
+}
+
+void Dataset::GenerateCASPDataset(std::string caspTargetsDir,
+								  std::string serverPredictionsDir,
+								  std::string fCSVOutputPath)
+{
+	std::ofstream trFile(fCSVOutputPath);
+	trFile.close(); // Truncate file
+	auto vecDB = utility::CATH_ListFiles(db_CATH);
+	ThreadPool pool(10); // Creates 10 threads.
+
+	// int totalTargets = utility::CountFilesInDir(caspTargetsDir),
+	// 	countNow = 0;
+
+	for (auto &target : std::filesystem::directory_iterator(caspTargetsDir))
+	{
+		auto targetPath = target.path().string();
+		auto targetBasename = target.path().filename().string();
+		auto targetName = utility::split(targetBasename, "\\.")[0];
+		// auto targetName = utility::split(utility::split(targetBasename, "\\.")[0], "\\-")[0];
+
+		if (!utility::endswith(targetBasename, ".pdb"))
+			continue;
+
+		std::cout << "Processing " << targetBasename << "\n";
+
+		auto targetProt = Protein(targetPath);
+
+		for (auto &dir : std::filesystem::directory_iterator(serverPredictionsDir))
+		{
+			auto dirPath = dir.path().string();
+			auto dirBasename = dir.path().filename().string();
+
+			if (utility::DirectoryExists(dirPath) && dirBasename == targetName)
+			{
+				for (auto &pred : std::filesystem::directory_iterator(dirPath))
+				{
+					auto predPath = pred.path().string();
+					auto predBasename = pred.path().filename().string();
+
+					if (!utility::endswith(predBasename.substr(0, predBasename.size() - 1),
+										   "TS"))
+						continue;
+
+					auto predProt = Protein(predPath);
+					auto predProfile = ProteinProfile(predProt);
+					predProfile.Read_FromFile(db_Profiles, 1 + 2 + 4 + 8);
+					if (predProfile.RemainingProfiles() != 0)
+					{
+						predProfile.Read_FromFile(db_Profiles, 32);
+						if (predProfile.FamilySize() == 0)
+						{
+							predProfile.Find_Homologous_Proteins(vecDB);
+						}
+						predProfile.CalculateProfiles(predProfile.RemainingProfiles());
+						predProfile.Write_ToFile(db_Profiles, 1 + 2 + 4 + 8 + 32);
+					}
+
+					std::ofstream outFile(fCSVOutputPath, std::ios_base::app);
+					GenerateData(predProfile, targetProt, outFile);
+					// pool.AddJob([this, targetProt, &outFile, &predProfile] {
+					// 	GenerateData(predProfile, targetProt, outFile);
+					// });
+				}
+			}
+		}
+		pool.WaitAll();
+	}
+	utility::Progress_Indicator("Generating dataset", 1, 1);
 }
 
 void Dataset::GenerateDataset(std::string sFamDir,
@@ -102,7 +171,6 @@ void Dataset::GenerateDataset(std::string sFamDir,
 	utility::Progress_Indicator("Generating dataset", 1, 1);
 }
 
-
 /**
  * @brief 				Engineer the features to be given as input to the ML model.
  * 
@@ -116,9 +184,10 @@ void Dataset::GenerateDataset(std::string sFamDir,
 void Dataset::GenerateData(ProteinProfile &profile, Protein candidProt,
 						   std::ostream &outFile, std::string sep)
 {
+	std::cout << profile._refProtein.fPath << " " << candidProt.fPath << "\n";
 	assert(profile._refProtein.length() == candidProt.length());
 
-	auto newProt = profile._refProtein; // make a copy of the target structure
+	auto newProt = profile._refProtein;		// make a copy of the target structure
 	newProt.sequence = candidProt.sequence; // replace with the new sequence
 	newProt.Calculate_Pot(Pot_S_Constant, true);
 
@@ -142,7 +211,9 @@ void Dataset::GenerateData(ProteinProfile &profile, Protein candidProt,
 	for (auto sc : retPot)
 		outSS << sc << sep;
 
-	auto retFreq = Evaluator::FrequencyScore(newProt, profile._aAA_Freq_Mean, profile._aAA_Freq_Stdev);
+	auto retFreq = Evaluator::FrequencyScore(newProt,
+											 profile._aAA_Freq_Mean,
+											 profile._aAA_Freq_Stdev);
 	for (auto sc : retFreq)
 		outSS << sc << sep;
 

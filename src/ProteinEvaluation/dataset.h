@@ -18,9 +18,13 @@ class Dataset {
 public:
 	void CheckFamilies(std::string sFDir);
 
+	void GenerateCASPDataset(std::string caspTargetsDir,
+							 std::string serverPredictionsDir,
+							 std::string fCSVOutputPath);
+
 	void GenerateDataset(std::string sFamDir,
-	                     std::string fCSV,
-	                     int nFamCutoff);
+						 std::string fCSV,
+						 int nFamCutoff);
 
 	void GenerateData(ProteinProfile& profile, Protein prot,
 	                  std::ostream& outFile, std::string sep = ",");
