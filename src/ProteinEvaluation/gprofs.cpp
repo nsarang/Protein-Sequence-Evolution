@@ -38,7 +38,7 @@ int main(int argc, const char * argv[]) {
 			profile.Read_FromFile(db_Profiles, 32);
 			if (profile.FamilySize() == 0) {
 				profile.Find_Homologous_Proteins(vecDB);
-			}
+		        }
  			profile.CalculateProfiles( profile.RemainingProfiles() );
 			profile.Write_ToFile(db_Profiles, 1 + 2 + 4 + 8 + 32);
 		}
