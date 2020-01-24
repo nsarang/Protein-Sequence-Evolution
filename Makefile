@@ -16,3 +16,4 @@ main:
 
 clean: 
 	$(MAKE) -C src/ProteinEvaluation clean
+	rm -r src/STRIDE/src/
