@@ -29,7 +29,7 @@
 
 class ProteinProfile {
 	friend class Evaluator;
-	friend class DeepAI;
+	friend class Dataset;
 
 public:
 	ProteinProfile(Protein target,

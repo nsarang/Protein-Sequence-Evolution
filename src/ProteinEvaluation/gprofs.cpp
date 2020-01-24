@@ -8,7 +8,6 @@
 #include "protein.h"
 #include "protein_profile.h"
 #include "evaluator.h"
-#include "deep.h"
 using namespace std;
 
 

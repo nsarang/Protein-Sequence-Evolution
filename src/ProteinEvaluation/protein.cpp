@@ -125,16 +125,12 @@ void Protein::Calculate_SS(bool bForceCalc) {
     std::string stdout, line, prev_line;
 
     auto oBuffer = subprocess::check_output({ex_STRIDE.c_str(), "-o", fPath.c_str()}, sp::error{sp::PIPE});
-   // std::ofstream ott("out.txt");
-   // ott << oBuffer.buf.data();
     std::stringstream ret(oBuffer.buf.data());
-   // std::cerr << ret.str() << "\n";
 
     int pos = 0;
     while (getline(ret, line)) {
         if (line.substr(0, 3) == "STR") {
             for (int i = 10; i < 60; ++i) {
- //               std::cerr << prev_line << "\n" << line << "\n";
 
                 if (isspace(prev_line[i]))
                     continue;
