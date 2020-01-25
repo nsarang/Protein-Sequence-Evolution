@@ -197,7 +197,9 @@ void Dataset::GenerateData(ProteinProfile &profile, Protein candidProt,
 
 	outSS << utility::FileBasename(newProt.fPath) << sep
 		  << utility::FileBasename(candidProt.fPath) << sep
-		  << newProt.length() << sep;
+		  << newProt.length() << sep
+		  << profile.FamilySize() << sep
+		  << profile.FamilyScore() << sep;
 
 	outSS << Evaluator::Solvent_Score(newProt, profile._aSolvent_Profile) << sep
 		  << Evaluator::Secondary_Struct(newProt, profile._aSec_Profile) << sep

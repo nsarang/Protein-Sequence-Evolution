@@ -18,9 +18,12 @@ int main(int argc, const char * argv[]) {
 	// auto target = Protein(target_path, 1 + 2 + 4 + 8);
 
 	Dataset DI;
-	DI.GenerateCASPDataset("/Users/blaze/University/Summer 2019/Protein Design/[Protein Sequence Evolution]/tests/casp12/casp12.domains_T0.releaseDec022016",
-						   "/Users/blaze/University/Summer 2019/Protein Design/[Protein Sequence Evolution]/tests/casp12",
-						   "ole.csv");
+	DI.GenerateDataset("data/FamilyProfiles/", "dataset.csv", 3);
+
+
+	// DI.GenerateCASPDataset("/Users/blaze/University/Summer 2019/Protein Design/[Protein Sequence Evolution]/tests/casp12/casp12.domains_T0.releaseDec022016",
+	// 					   "/Users/blaze/University/Summer 2019/Protein Design/[Protein Sequence Evolution]/tests/casp12",
+	// 					   "ole.csv");
 
 	// std::string HEAD;
 
@@ -76,17 +79,5 @@ int main(int argc, const char * argv[]) {
 	std::sample(vecDB.begin(), vecDB.end(),
 	            std::back_inserter(vecSample),
 	            1000, std::mt19937{std::random_device{}()});
-	*/
-
-	/*
-	for (auto fPath : vecDB) {
-		std::cerr << fPath << "\n";
-		auto prot = Protein(fPath);
-		auto profile = ProteinProfile(prot);
-
-		profile.Read_FromFile();
-		if (profile.CalculateRemainingProfiles(vecDB, true))
-			profile.Write_ToFile();
-	}
 	*/
 }
