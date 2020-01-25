@@ -712,7 +712,7 @@ int ProteinProfile::FamilySize()
 	return _nFamilySize;
 }
 
-int ProteinProfile::FamilyScore()
+double ProteinProfile::FamilyScore()
 {
 	return _dFamilyScore;
 }
