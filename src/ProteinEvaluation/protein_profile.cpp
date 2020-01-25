@@ -46,7 +46,7 @@ void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB,
 
 	for (auto &t : _vecTupleAlignments)
 		_dFamilyScore += std : get<0>(t);
-	_dFamilyScore /= _nFamilySize
+	_dFamilyScore /= _nFamilySize;
 }
 
 bool ProteinProfile::CalculateProfiles(int nFlag, bool bVerbose)
