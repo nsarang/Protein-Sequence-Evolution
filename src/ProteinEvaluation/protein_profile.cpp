@@ -45,7 +45,7 @@ void ProteinProfile::Find_Homologous_Proteins(std::vector<std::string> vecDB,
 	_vecHomologous_Proteins = utility::VectorSubset(_vecHomologous_Proteins, indices);
 
 	for (auto &t : _vecTupleAlignments)
-		_dFamilyScore += std : get<0>(t);
+		_dFamilyScore += std::get<0>(t);
 	_dFamilyScore /= _nFamilySize;
 }
 
