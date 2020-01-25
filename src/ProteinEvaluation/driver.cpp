@@ -17,21 +17,26 @@ int main(int argc, const char * argv[]) {
 	// std::string target_path = argv[1];
 	// auto target = Protein(target_path, 1 + 2 + 4 + 8);
 
-	std::string HEAD;
+	Dataset DI;
+	DI.GenerateCASPDataset("/Users/blaze/University/Summer 2019/Protein Design/[Protein Sequence Evolution]/tests/casp12/casp12.domains_T0.releaseDec022016",
+						   "/Users/blaze/University/Summer 2019/Protein Design/[Protein Sequence Evolution]/tests/casp12",
+						   "ole.csv");
+
+	// std::string HEAD;
 
 
-	HEAD = "./CATH/2e5yA01";
-	HEAD = utility::split(HEAD, "\\s")[0];
-	HEAD = utility::split(HEAD, "\\/").back();
+	// HEAD = "./CATH/2e5yA01";
+	// HEAD = utility::split(HEAD, "\\s")[0];
+	// HEAD = utility::split(HEAD, "\\/").back();
 
-	cout << db_CATH + HEAD << "\n";
+	// cout << db_CATH + HEAD << "\n";
 
 
-	HEAD = "./CATH/2e5yA01 0.5352";
-	HEAD = utility::split(HEAD, "\\s")[0];
-	HEAD = utility::split(HEAD, "/").back();
+	// HEAD = "./CATH/2e5yA01 0.5352";
+	// HEAD = utility::split(HEAD, "\\s")[0];
+	// HEAD = utility::split(HEAD, "/").back();
 
-	cout << HEAD << "\n";
+	// cout << HEAD << "\n";
 
 
 	// auto vecDB = utility::CATH_ListFiles(db_CATH);
