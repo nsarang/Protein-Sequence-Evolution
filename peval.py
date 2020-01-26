@@ -5,7 +5,7 @@ import xgboost as xgb
 import numpy as np
 
 EXE_PATH = "bin/gscores"
-XGB_MODEL = "data/xgbreg.bin"
+XGB_MODEL = "dev/DL-Model/xgbreg_final.bin"
 
 
 def get_args():
