@@ -119,7 +119,7 @@ void Dataset::GenerateDataset(std::string sFamDir,
 	std::ofstream trFile(fCSV);
 	trFile.close(); // Truncate file
 	auto vecDB = utility::CATH_ListFiles(db_CATH);
-	ThreadPool pool(std::thread::hardware_concurrency()); // Creates threads.
+	ThreadPool pool(2 * std::thread::hardware_concurrency()); // Creates threads.
 
 	std::map<int, std::vector<Protein>> mpProtEqLen;
 	int countNow = 0;
