@@ -60,7 +60,6 @@ void Dataset::GenerateCASPDataset(std::string caspTargetsDir,
 		auto targetPath = target.path().string();
 		auto targetBasename = target.path().filename().string();
 		auto targetName = utility::split(targetBasename, "\\.")[0];
-		// auto targetName = utility::split(utility::split(targetBasename, "\\.")[0], "\\-")[0];
 
 		if (!utility::endswith(targetBasename, ".pdb"))
 			continue;
@@ -100,10 +99,9 @@ void Dataset::GenerateCASPDataset(std::string caspTargetsDir,
 					}
 
 					std::ofstream outFile(fCSVOutputPath, std::ios_base::app);
-					GenerateData(predProfile, targetProt, outFile);
-					// pool.AddJob([this, targetProt, &outFile, &predProfile] {
-					// 	GenerateData(predProfile, targetProt, outFile);
-					// });
+					pool.AddJob([this, targetProt, &outFile, &predProfile] {
+						GenerateData(predProfile, targetProt, outFile);
+					});
 				}
 			}
 		}
